@@ -2296,11 +2296,36 @@ textarea {
   grid-template-columns: minmax(120px, 1fr) auto auto auto;
   gap: 10px;
   align-items: center;
+  min-width: 0;
   min-height: 64px;
   padding: 13px 14px;
   border: 1px solid rgba(29, 37, 32, 0.1);
   border-radius: 8px;
   background: #fffaf0;
+}
+
+.class-row > *,
+.vendor-row > *,
+.lead-row > *,
+.page-signal > *,
+.sponsor-tier > *,
+.ticket-product > *,
+.payment-method > * {
+  min-width: 0;
+}
+
+.vendor-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.vendor-row span,
+.vendor-row small,
+.vendor-link {
+  grid-column: 1 / -1;
+  justify-self: start;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .participant-row {
@@ -2323,6 +2348,7 @@ textarea {
 .vendor-row small,
 .vendor-link {
   color: #626960;
+  overflow-wrap: anywhere;
 }
 
 .vendor-link {
@@ -2338,6 +2364,7 @@ textarea {
 .class-row em,
 .vendor-row em {
   justify-self: end;
+  max-width: 100%;
   padding: 4px 8px;
   border-radius: 999px;
   color: #183024;
@@ -2345,6 +2372,7 @@ textarea {
   font-size: 12px;
   font-style: normal;
   font-weight: 850;
+  overflow-wrap: anywhere;
 }
 
 .class-row button {
@@ -3358,7 +3386,10 @@ textarea {
   .admin-lock-layout,
   .admin-login-preview,
   .admin-inventory-panel,
-  .setup-wizard {
+  .setup-wizard,
+  .page-grid,
+  .form-page-grid,
+  .tickets-page {
     grid-template-columns: 1fr;
   }
 
@@ -3370,9 +3401,6 @@ textarea {
   .scan-strip,
   .home-action-strip,
   .page-signal-band,
-  .page-grid,
-  .form-page-grid,
-  .tickets-page,
   .review-section,
   .admin-workspace,
   .admin-editor-grid,
