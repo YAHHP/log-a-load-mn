@@ -256,6 +256,41 @@ const trafficMetrics = [
   { label: 'Admin exports', value: '4', detail: 'Orders, tickets, funds, vendors' },
 ]
 
+const pageSignals = {
+  tickets: [
+    { icon: Mountain, label: 'Featured event', value: 'Mud Fest Hillman', detail: 'Tickets, pit passes, kids pricing, and camping.' },
+    { icon: ShieldCheck, label: 'Checkout safety', value: 'Hosted payment', detail: 'PayPal first. No card data stored here.' },
+    { icon: ReceiptText, label: 'Gate handoff', value: 'Receipt check-in', detail: 'Provider receipt now; barcode flow later.' },
+  ],
+  donate: [
+    { icon: BadgeDollarSign, label: 'Fund choice', value: '4 charity lanes', detail: 'Donors can direct intent before payment.' },
+    { icon: LockKeyhole, label: 'Payment trust', value: 'Provider hosted', detail: 'PayPal, Venmo, and Stripe links stay external.' },
+    { icon: Download, label: 'Admin proof', value: 'Export-ready', detail: 'Fund selection should reconcile to reports.' },
+  ],
+  register: [
+    { icon: ClipboardList, label: 'Role templates', value: 'Volunteer, crew, puller, golfer', detail: 'Every event can define its own signup type.' },
+    { icon: Gauge, label: 'Capacity view', value: 'Caps visible', detail: 'Admins can see registered versus available.' },
+    { icon: Mail, label: 'Follow-up', value: 'Admin email next', detail: 'Production should route each form by event.' },
+  ],
+  vendors: [
+    { icon: Store, label: 'Partner lanes', value: 'Vendor + sponsor', detail: 'Food, booths, sponsors, and charity stations.' },
+    { icon: Globe2, label: 'Outbound pages', value: 'Links supported', detail: 'Real vendor websites can be listed cleanly.' },
+    { icon: HandHeart, label: 'Sponsor growth', value: 'Tier packages', detail: 'Simple packages now, invoices later.' },
+  ],
+  faq: [
+    { icon: FileText, label: 'Rules first', value: 'Buyer confidence', detail: 'Pricing, refunds, weather, camping, and pit notes.' },
+    { icon: Wallet, label: 'Payment clarity', value: 'No card storage', detail: 'Payment provider handles the sensitive data.' },
+    { icon: Mail, label: 'Contact path', value: 'One form', detail: 'Questions become admin follow-up records.' },
+  ],
+  admin: [
+    { icon: LockKeyhole, label: 'Access control', value: 'Auth required', detail: 'Real edit power needs server-side login.' },
+    { icon: BarChart3, label: 'Operations view', value: 'Counts + exports', detail: 'Tickets, funds, vendors, donors, and registrations.' },
+    { icon: ShieldCheck, label: 'Payment proof', value: 'Webhook-ready', detail: 'Paid records should reconcile to provider reports.' },
+  ],
+}
+
+const donationPresets = ['$25', '$50', '$100', '$250']
+
 const ticketInventory = ticketOptions.map((ticket) => {
   const remaining = ticket.capacity - ticket.sold
   const percentSold = Math.round((ticket.sold / ticket.capacity) * 100)
@@ -807,6 +842,32 @@ function UsersLabel({ event }) {
   )
 }
 
+function PageSignalBand({ items }) {
+  return (
+    <section className="page-signal-band" aria-label="Page status and next steps">
+      {items.map((item) => {
+        const Icon = item.icon
+        return (
+          <div className="page-signal" key={item.label}>
+            <Icon size={18} />
+            <span>{item.label}</span>
+            <strong>{item.value}</strong>
+            <small>{item.detail}</small>
+          </div>
+        )
+      })}
+    </section>
+  )
+}
+
+function VendorUrl({ url }) {
+  const isExternal = url.includes('.') && !url.toLowerCase().includes('pending')
+  if (!isExternal) return <small>{url}</small>
+
+  const href = url.startsWith('http') ? url : `https://${url}`
+  return <a className="vendor-link" href={href} target="_blank" rel="noreferrer">{url}</a>
+}
+
 function EventVisual({ event, compact = false }) {
   const Icon = event.icon || CalendarDays
   if (event.image) {
@@ -828,9 +889,12 @@ function EventVisual({ event, compact = false }) {
 }
 
 function DonatePage({ selectedFund, setSelectedFund, selectedPayment, setSelectedPayment, handleHostedPayment }) {
+  const [donationAmount, setDonationAmount] = useState('$100')
+
   return (
     <>
       <PageIntro kicker="Donations" icon={BadgeDollarSign} title="Let donors choose the exact charity lane." copy="Mud Fest ticket money can feed the event charity pool, while extra gifts can go to Children’s Miracle Network, local family support, or wherever Log A Load needs it most." />
+      <PageSignalBand items={pageSignals.donate} />
       <section className="form-page-grid">
         <div className="fund-grid tall">
           {funds.map((fund) => (
@@ -853,13 +917,19 @@ function DonatePage({ selectedFund, setSelectedFund, selectedPayment, setSelecte
             <span>2 Donor info</span>
             <span>3 Hosted payment</span>
           </div>
+          <div className="amount-presets" aria-label="Quick donation amounts">
+            {donationPresets.map((amount) => (
+              <button className={donationAmount === amount ? 'selected' : ''} type="button" key={amount} onClick={() => setDonationAmount(amount)}>{amount}</button>
+            ))}
+          </div>
           <label>Selected fund<input name="fund" value={selectedFund.label} readOnly /></label>
-          <label>Donation amount<input name="amount" defaultValue="$100" inputMode="decimal" /></label>
+          <label>Donation amount<input name="amount" value={donationAmount} inputMode="decimal" onChange={(event) => setDonationAmount(event.target.value)} /></label>
           <label>Donor name<input name="name" placeholder="Name or company" required /></label>
           <div className="two-col">
             <label>Email<input name="email" type="email" placeholder="you@example.com" required /></label>
             <label>Phone<input name="phone" type="tel" placeholder="(555) 000-0000" /></label>
           </div>
+          <label>Dedication or note<textarea name="note" placeholder="Optional: in honor of, company note, event note, or receipt memo" /></label>
           <div className="payment-method-grid" aria-label="Payment method options">
             {paymentMethods.map((method) => (
               <button className={selectedPayment.id === method.id ? 'payment-method selected' : 'payment-method'} type="button" key={method.id} onClick={() => setSelectedPayment(method)}>
@@ -883,6 +953,7 @@ function TicketsPage({ selectedTicket, setSelectedTicket, selectedPayment, setSe
   return (
     <>
       <PageIntro kicker="Mud Fest tickets" icon={Ticket} title="Build a Mud Fest order and send it to hosted checkout." copy="General admission, kids tickets, pit passes, and camping are separated with final wording notes. PayPal is the v1 checkout path; Stripe and Venmo can be connected without storing card data here." />
+      <PageSignalBand items={pageSignals.tickets} />
       <section className="tickets-page">
         <div className="ticket-stack">
           <div className="ticket-product-grid">
@@ -954,6 +1025,7 @@ function ParticipantsPage({ handleSubmit }) {
   return (
     <>
       <PageIntro kicker="Event registration" icon={ClipboardList} title="One signup lane for every event role." copy="Each event can define what registration means: volunteer, competitor, golfer, camping helper, sponsor rep, raffle donor, or day-of operations crew." />
+      <PageSignalBand items={pageSignals.register} />
       <section className="page-grid">
         <div className="class-table">
           <div className="rules-box">
@@ -989,6 +1061,7 @@ function ParticipantsPage({ handleSubmit }) {
             <label>City / hometown<input name="city" placeholder="Optional" /></label>
           </div>
           <label>Notes for admins<textarea name="notes" placeholder="Shift preference, class info, sponsor notes, accessibility needs, or questions" /></label>
+          <label className="check-field"><input name="acknowledgement" type="checkbox" required /> I understand the event team will confirm final role details, rules, fees, and check-in instructions before the event.</label>
           <button className="primary-button full" type="submit">Submit event registration</button>
         </form>
       </section>
@@ -1000,6 +1073,7 @@ function VendorsPage({ handleSubmit }) {
   return (
     <>
       <PageIntro kicker="Vendors + sponsors" icon={Store} title="Give every event partner a clean public lane." copy="Food vendors, beer garden sponsors, camping operations, Log A Load booths, golf sponsors, and future sponsor packages all need a clean form, clear status, and admin follow-up path." />
+      <PageSignalBand items={pageSignals.vendors} />
       <section className="page-grid">
         <div className="vendor-page-stack">
           <div className="vendor-list rich-list">
@@ -1008,7 +1082,7 @@ function VendorsPage({ handleSubmit }) {
                 <strong>{vendor.name}</strong>
                 <span>{vendor.type}</span>
                 <em>{vendor.status}</em>
-                <small>{vendor.url}</small>
+                <VendorUrl url={vendor.url} />
               </div>
             ))}
           </div>
@@ -1032,6 +1106,8 @@ function VendorsPage({ handleSubmit }) {
           </div>
           <label>Booth type<select name="booth" defaultValue="10x10 Vendor Booth"><option>10x10 Vendor Booth</option><option>20x20 Vendor Booth</option><option>Food Vendor</option><option>Sponsor Table</option></select></label>
           <label>Event interest<select name="eventInterest" defaultValue="Mud Fest Hillman"><option>Mud Fest Hillman</option><option>Future Truck Pull</option><option>Golf Classic</option><option>General sponsor</option></select></label>
+          <label>Website or social page<input name="website" placeholder="https://example.com or Facebook page" /></label>
+          <label>Setup needs<textarea name="setupNeeds" placeholder="Power, space, arrival timing, product/menu, sponsor questions, or insurance notes" /></label>
           <button className="primary-button full" type="submit">Send vendor request</button>
         </form>
       </section>
@@ -1043,6 +1119,7 @@ function FaqPage({ handleSubmit }) {
   return (
     <>
       <PageIntro kicker="FAQ + rules" icon={FileText} title="Answer the buyer questions before they slow down checkout." copy="This page keeps pricing notes, payment safety, event rules, and contact paths in one place so QR-code visitors can make a decision quickly." />
+      <PageSignalBand items={pageSignals.faq} />
       <section className="faq-layout">
         <div className="faq-list">
           {faqItems.map((item) => (
@@ -1150,6 +1227,7 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
     return (
       <>
         <PageIntro kicker="Admin access" icon={LockKeyhole} title="Admin dashboard is locked on the public site." copy="This preview needs an access gate for demo work, and real production needs server-side authentication before admins can edit events, tickets, funds, or exports." />
+        <PageSignalBand items={pageSignals.admin} />
         <section className="admin-lock-layout">
           <form className="form-card admin-lock-card" onSubmit={handleAdminUnlock}>
             <div className="section-kicker"><ShieldCheck size={16} /> Local demo gate</div>
@@ -1174,6 +1252,7 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
   return (
     <>
       <PageIntro kicker="Admin preview" icon={LayoutDashboard} title="Run every fundraiser without making non-technical admins fight the website." copy="This is the v1 admin blueprint: login gate, analytics, orders, exports, event editor, payment setup status, and the fields admins need to change without touching code." />
+      <PageSignalBand items={pageSignals.admin} />
       <section className="admin-workspace">
         <div className="admin-sidebar">
           <button className="active" type="button"><BarChart3 size={17} /> Overview</button>
@@ -1315,6 +1394,7 @@ function AdminLockedPage({ go }) {
   return (
     <>
       <PageIntro kicker="Admin locked" icon={LockKeyhole} title="Admin dashboard is not public." copy="The public GitHub Pages demo intentionally hides the dashboard. That keeps the URL clean for buyers and protects the site from looking like anyone can access back-office tools." />
+      <PageSignalBand items={pageSignals.admin} />
       <section className="admin-lock-layout">
         <div className="admin-lock-card guidance-card">
           <div className="section-kicker"><ShieldCheck size={16} /> What this means</div>

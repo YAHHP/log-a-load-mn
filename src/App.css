@@ -664,6 +664,54 @@ button {
   line-height: 1.55;
 }
 
+.page-signal-band {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0 clamp(18px, 5vw, 72px);
+  margin: clamp(-28px, -3vw, -18px) 0 clamp(24px, 4vw, 42px);
+}
+
+.page-signal {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  align-items: start;
+  min-height: 118px;
+  padding: 16px;
+  border: 1px solid rgba(29, 37, 32, 0.12);
+  border-radius: 8px;
+  color: #25352c;
+  background: #fffaf0;
+  box-shadow: 0 16px 38px rgba(35, 53, 42, 0.1);
+}
+
+.page-signal svg {
+  grid-row: 1 / span 3;
+  color: #c24f19;
+  margin-top: 2px;
+}
+
+.page-signal span {
+  color: #b94e1b;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.page-signal strong {
+  font-size: 19px;
+  line-height: 1.1;
+}
+
+.page-signal small {
+  color: #626960;
+  line-height: 1.4;
+}
+
 .metric {
   display: grid;
   gap: 3px;
@@ -1576,6 +1624,24 @@ textarea {
   resize: vertical;
 }
 
+.check-field {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(45, 106, 79, 0.18);
+  border-radius: 8px;
+  color: #375043;
+  background: #edf8ef;
+  line-height: 1.35;
+}
+
+.check-field input {
+  width: 18px;
+  min-height: 18px;
+  margin-top: 1px;
+}
+
 .two-col {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1625,6 +1691,28 @@ textarea {
 .fund small {
   color: #667067;
   line-height: 1.35;
+}
+
+.amount-presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.amount-presets button {
+  min-height: 42px;
+  border: 1px solid rgba(29, 37, 32, 0.12);
+  border-radius: 999px;
+  color: #244132;
+  background: #fff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.amount-presets button.selected,
+.amount-presets button:hover {
+  border-color: #234c37;
+  background: #edf8ef;
 }
 
 .tier {
@@ -2084,8 +2172,19 @@ textarea {
 
 .class-row span,
 .vendor-row span,
-.vendor-row small {
+.vendor-row small,
+.vendor-link {
   color: #626960;
+}
+
+.vendor-link {
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.vendor-link:hover {
+  color: #b94e1b;
 }
 
 .class-row em,
@@ -2789,6 +2888,7 @@ textarea {
 
   .metrics-band,
   .scan-strip,
+  .page-signal-band,
   .page-grid,
   .form-page-grid,
   .tickets-page,
@@ -2852,6 +2952,7 @@ textarea {
   .rules-section,
   .success-layout,
   .faq-layout,
+  .page-signal-band,
   .scan-strip,
   .scan-actions,
   .mudfest-showcase,
@@ -2905,6 +3006,10 @@ textarea {
   .payment-grid,
   .two-col {
     grid-template-columns: 1fr;
+  }
+
+  .page-signal-band {
+    margin-top: -20px;
   }
 
   .participant-row small {
