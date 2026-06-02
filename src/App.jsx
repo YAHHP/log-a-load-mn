@@ -158,6 +158,8 @@ const paymentLinks = {
   stripeDonate: safeHostedPaymentUrl(import.meta.env.VITE_STRIPE_DONATE_URL),
 }
 
+const publicSiteUrl = 'https://yahhp.github.io/log-a-load-mn/'
+
 function assetPath(filename) {
   return `${import.meta.env.BASE_URL}${filename}`
 }
@@ -181,6 +183,19 @@ const eventNetwork = [
   { icon: Tractor, status: 'Template ready', title: 'Truck Pull', copy: 'Rules, classes, vehicle info, event registration, sponsors, and gate check-in.' },
   { icon: Trophy, status: 'Existing fundraiser', title: 'Golf Classic', copy: 'Teams, hole sponsors, banquet tickets, raffle funds, and sponsor recognition.' },
   { icon: PlusCircle, status: 'Expandable', title: 'Next Minnesota event', copy: 'A repeatable structure for dinners, raffles, auctions, rides, or local benefit events.' },
+]
+
+const homeSignals = [
+  { icon: QrCode, label: 'QR first', value: 'Scan to event action', detail: 'Home is built for phones, signs, flyers, and event-day traffic.' },
+  { icon: Wallet, label: 'Hosted payment', value: 'PayPal-ready path', detail: 'Checkout can launch through provider-owned links before a full backend.' },
+  { icon: LayoutDashboard, label: 'Admin future', value: 'Track every lane', detail: 'Tickets, donations, vendors, registrations, and exports belong in one dashboard.' },
+]
+
+const qrTargets = [
+  { image: 'qr-mudfest.svg', label: 'Mud Fest landing', path: '/mudfest', url: `${publicSiteUrl}#/mudfest`, icon: Mountain, detail: 'Event overview, tickets, donations, rules, and contact.' },
+  { image: 'qr-tickets.svg', label: 'Buy tickets', path: '/tickets', url: `${publicSiteUrl}#/tickets`, icon: Ticket, detail: 'General admission, kids, pit pass, and camping lanes.' },
+  { image: 'qr-donate.svg', label: 'Donate', path: '/donate', url: `${publicSiteUrl}#/donate`, icon: BadgeDollarSign, detail: 'Pick the fund before going to hosted checkout.' },
+  { image: 'qr-register.svg', label: 'Register', path: '/register', url: `${publicSiteUrl}#/register`, icon: ClipboardList, detail: 'Volunteer, puller, golfer, crew, vendor, or sponsor intake.' },
 ]
 
 const participantOptions = [
@@ -474,10 +489,10 @@ function Header({ route, mobileOpen, setMobileOpen }) {
 
 function HomePage({ metrics, go }) {
   const quickActions = [
-    { path: '/events', icon: CalendarDays, label: 'Browse events', detail: 'Mud Fest now, truck pull and golf templates ready.' },
-    { path: '/tickets', icon: Ticket, label: 'Buy tickets', detail: 'Featured-event checkout without digging.' },
-    { path: '/donate', icon: BadgeDollarSign, label: 'Pick a charity fund', detail: 'Choose exactly where the donation should go.' },
-    { path: '/register', icon: ClipboardList, label: 'Register for an event', detail: 'Volunteer, competitor, golfer, crew, or sponsor rep.' },
+    { path: '/tickets', icon: Ticket, label: 'Buy tickets', detail: 'Start the Mud Fest order.' },
+    { path: '/donate', icon: BadgeDollarSign, label: 'Donate', detail: 'Choose the charity fund.' },
+    { path: '/events', icon: CalendarDays, label: 'Browse events', detail: 'See all Minnesota fundraisers.' },
+    { path: '/register', icon: ClipboardList, label: 'Register', detail: 'Volunteer, puller, golfer, or vendor.' },
   ]
 
   return (
@@ -494,25 +509,37 @@ function HomePage({ metrics, go }) {
             <img src={assetPath('mudfest-logo.png')} alt="Mud Fest Hillman logo" decoding="async" />
             <span>Launch event: Mud Fest Hillman</span>
           </div>
-          <h1>Minnesota events that fund the cause.</h1>
+          <h1>Scan once. Pick the event. Fund the cause.</h1>
           <p className="hero-copy">
-            Log A Load Minnesota gets one clean hub for tickets, donations, sponsors, vendors, event registration, and admin tracking. Mud Fest Hillman is the first featured fundraiser, and the same system can carry truck pulls, golf, raffles, dinners, and future events.
+            Log A Load Minnesota gets a phone-first home base for QR traffic: tickets, donations, event registration, vendors, sponsors, rules, and receipts. Mud Fest Hillman is the launch fundraiser, and the same structure can carry truck pulls, golf, raffles, dinners, and future events.
           </p>
           <div className="hero-actions">
-            <button className="primary-button large" type="button" onClick={() => go('/events')}>Browse events <ArrowRight size={18} /></button>
-            <button className="secondary-button large" type="button" onClick={() => go('/tickets')}>Buy Mud Fest tickets</button>
+            <button className="primary-button large" type="button" onClick={() => go('/tickets')}>Buy Mud Fest tickets <ArrowRight size={18} /></button>
+            <button className="secondary-button large" type="button" onClick={() => go('/events')}>Browse events</button>
             <button className="secondary-button large" type="button" onClick={() => go('/donate')}>Donate now</button>
+          </div>
+          <div className="hero-signal-row" aria-label="Home page priorities">
+            {homeSignals.map((signal) => {
+              const Icon = signal.icon
+              return (
+                <span key={signal.label}>
+                  <Icon size={17} />
+                  <strong>{signal.value}</strong>
+                  <small>{signal.label}</small>
+                </span>
+              )
+            })}
           </div>
         </div>
         <aside className="hero-panel" aria-label="Event quick actions">
           <img className="hero-panel-photo" src={assetPath('mudfest-2024-event.jpg')} alt="Mud Fest trucks and off-road event preview" decoding="async" />
-          <div className="panel-topline">QR landing target</div>
-          <h2>Scan, buy a ticket, pick a fund, and show the confirmation at check-in.</h2>
-          <div className="qr-box"><QrCode size={84} /><span>logaloadmn.org/mudfest</span></div>
+          <div className="panel-topline">Working QR target</div>
+          <h2>Scan the code to open the Mud Fest charity landing page.</h2>
+          <QrPanel target={qrTargets[0]} />
           <div className="quick-grid">
-            <a href="#/events"><CalendarDays size={17} /> Event center</a>
             <a href="#/tickets"><Ticket size={17} /> Buy tickets</a>
             <a href="#/donate"><BadgeDollarSign size={17} /> Choose fund</a>
+            <a href="#/events"><CalendarDays size={17} /> Event center</a>
             <a href="#/register"><ClipboardList size={17} /> Register</a>
             <a href="#/faq"><FileText size={17} /> Rules</a>
           </div>
@@ -529,10 +556,10 @@ function HomePage({ metrics, go }) {
         ))}
       </section>
 
-      <section className="scan-strip" aria-label="QR code quick paths">
+      <section className="home-action-strip" aria-label="Visitor quick actions">
         <div>
-          <div className="section-kicker"><QrCode size={16} /> Scanned the QR code?</div>
-          <h2>Pick the thing you came here to do.</h2>
+          <div className="section-kicker"><ArrowRight size={16} /> Fast lane</div>
+          <h2>Most visitors need one of these four paths.</h2>
         </div>
         <div className="scan-actions">
           {quickActions.map((action) => {
@@ -544,6 +571,17 @@ function HomePage({ metrics, go }) {
               </button>
             )
           })}
+        </div>
+      </section>
+
+      <section className="scan-strip" aria-label="QR code quick paths">
+        <div>
+          <div className="section-kicker"><QrCode size={16} /> Working QR codes</div>
+          <h2>Print-ready QR paths for the event table, flyers, and signs.</h2>
+          <p>Each code opens a real public page on the current GitHub Pages demo. When the final domain is ready, regenerate the QR files with the new URL.</p>
+        </div>
+        <div className="qr-action-grid">
+          {qrTargets.map((target) => <QrRouteCard target={target} go={go} key={target.label} />)}
         </div>
       </section>
 
@@ -839,6 +877,27 @@ function UsersLabel({ event }) {
     <>
       <ClipboardList size={14} /> {event.audience}
     </>
+  )
+}
+
+function QrPanel({ target }) {
+  return (
+    <div className="qr-box">
+      <img src={assetPath(target.image)} alt={`QR code for ${target.label}`} loading="eager" decoding="async" />
+      <span>{target.url}</span>
+    </div>
+  )
+}
+
+function QrRouteCard({ target, go }) {
+  const Icon = target.icon
+  return (
+    <button className="qr-route-card" type="button" onClick={() => go(target.path)}>
+      <img src={assetPath(target.image)} alt={`QR code for ${target.label}`} loading="eager" decoding="async" />
+      <span><Icon size={17} /> {target.label}</span>
+      <strong>{target.detail}</strong>
+      <small>{target.url}</small>
+    </button>
   )
 }
 

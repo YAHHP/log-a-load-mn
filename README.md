@@ -78,6 +78,23 @@ Helpful official docs:
 - Stripe Payment Links: https://docs.stripe.com/payments/payment-links
 - Vite env variables: https://vite.dev/guide/env-and-mode/
 
+## QR Codes
+
+The Home page uses real static QR SVGs in `public/` for the current GitHub Pages demo URLs.
+
+Regenerate them after the final domain changes:
+
+```bash
+PUBLIC_SITE_URL="https://example.org/" npm run generate:qrs
+```
+
+Current generated targets:
+
+- `public/qr-mudfest.svg` -> `https://yahhp.github.io/log-a-load-mn/#/mudfest`
+- `public/qr-tickets.svg` -> `https://yahhp.github.io/log-a-load-mn/#/tickets`
+- `public/qr-donate.svg` -> `https://yahhp.github.io/log-a-load-mn/#/donate`
+- `public/qr-register.svg` -> `https://yahhp.github.io/log-a-load-mn/#/register`
+
 ## Mud Fest Ticket Assumptions
 
 Current prototype pricing is based on relayed notes and must be confirmed before launch:
