@@ -53,6 +53,12 @@ const events = [
     status: 'Registration open',
     goal: '$40,000',
     raised: '$12,640',
+    image: 'mudfest-2024.jpg',
+    visualAlt: 'Mud Fest vehicle moving through mud in front of a crowd',
+    icon: Mountain,
+    audience: 'Families, truck fans, campers',
+    impact: 'Tickets + donations feed the launch charity lane.',
+    actionLabel: 'Open Mud Fest page',
     summary: 'Log A Load charity ticketing and donation lane for Mud Fest: food, trucks, beer gardens, camping, pits, kids tickets, and fund selection.',
     schedule: ['Gates Friday 8:00 AM', 'Food trucks + vendors', 'Beer garden', 'Camping + pit access'],
   },
@@ -64,7 +70,13 @@ const events = [
     status: 'Planning',
     goal: '$50,000',
     raised: '$18,420',
-    summary: 'Participant registration, class rules, tickets, vendors, sponsors, and event-day check-in.',
+    image: 'mudfest-2024-event.jpg',
+    visualAlt: 'Off-road event vehicle preview for truck pull planning',
+    icon: Tractor,
+    audience: 'Drivers, crews, sponsors',
+    impact: 'A future event template for classes, tickets, vendors, and check-in.',
+    actionLabel: 'Preview ticket flow',
+    summary: 'Event registration, class rules, tickets, vendors, sponsors, and event-day check-in.',
     schedule: ['Vendor row opens', 'Participant check-in', 'Opening ceremony', 'Classes begin'],
   },
   {
@@ -75,6 +87,11 @@ const events = [
     status: 'Draft',
     goal: '$25,000',
     raised: '$9,800',
+    visual: 'golf',
+    icon: Trophy,
+    audience: 'Teams, hole sponsors, donors',
+    impact: 'A clean hub for teams, sponsor tiers, banquet tickets, and raffle funds.',
+    actionLabel: 'Preview sponsor flow',
     summary: 'Teams, hole sponsors, banquet tickets, raffle donations, and sponsor recognition.',
     schedule: ['Team check-in', 'Shotgun start', 'Lunch', 'Awards and raffle'],
   },
@@ -737,18 +754,27 @@ function EventsPage({ selectedEvent, setSelectedEvent, go }) {
         <div className="event-list">
           {events.map((event) => (
             <button className={selectedEvent.id === event.id ? 'event-card active' : 'event-card'} key={event.id} type="button" onClick={() => setSelectedEvent(event)}>
+              <EventVisual event={event} compact />
               <span>{event.status}</span>
               <strong>{event.label}</strong>
               <small><CalendarDays size={14} /> {event.date}</small>
               <small><MapPin size={14} /> {event.location}</small>
+              <small><UsersLabel event={event} /></small>
               <p>{event.summary}</p>
             </button>
           ))}
         </div>
         <div className="event-detail-panel">
-          <div className="section-kicker"><Trophy size={16} /> Selected event</div>
-          <h2>{selectedEvent.label}</h2>
-          <p>{selectedEvent.summary}</p>
+          <EventVisual event={selectedEvent} />
+          <div className="event-detail-copy">
+            <div className="section-kicker"><Trophy size={16} /> Selected event</div>
+            <h2>{selectedEvent.label}</h2>
+            <p>{selectedEvent.summary}</p>
+          </div>
+          <div className="event-impact-note">
+            <strong>{selectedEvent.audience}</strong>
+            <span>{selectedEvent.impact}</span>
+          </div>
           <div className="event-stats">
             <span><strong>{selectedEvent.goal}</strong> goal</span>
             <span><strong>{selectedEvent.raised}</strong> raised</span>
@@ -761,7 +787,7 @@ function EventsPage({ selectedEvent, setSelectedEvent, go }) {
             })}
           </div>
           <div className="hero-actions">
-            <button className="primary-button" type="button" onClick={() => go(selectedEvent.id === 'mud-fest' ? '/mudfest' : '/tickets')}>Event page</button>
+            <button className="primary-button" type="button" onClick={() => go(selectedEvent.id === 'mud-fest' ? '/mudfest' : selectedEvent.id === 'golf-classic' ? '/vendors' : '/tickets')}>{selectedEvent.actionLabel}</button>
             <button className="secondary-button" type="button" onClick={() => go('/tickets')}>Tickets</button>
             <button className="secondary-button" type="button" onClick={() => go('/register')}>Event registration</button>
             <button className="secondary-button" type="button" onClick={() => go('/donate')}>Donate to this event</button>
@@ -769,6 +795,34 @@ function EventsPage({ selectedEvent, setSelectedEvent, go }) {
         </div>
       </section>
     </>
+  )
+}
+
+function UsersLabel({ event }) {
+  return (
+    <>
+      <ClipboardList size={14} /> {event.audience}
+    </>
+  )
+}
+
+function EventVisual({ event, compact = false }) {
+  const Icon = event.icon || CalendarDays
+  if (event.image) {
+    return (
+      <div className={compact ? 'event-visual compact' : 'event-visual'}>
+        <img src={assetPath(event.image)} alt={event.visualAlt || event.label} loading="lazy" />
+        <span><Icon size={16} /> {event.label}</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className={compact ? `event-visual event-art ${event.visual || ''} compact` : `event-visual event-art ${event.visual || ''}`}>
+      <div className="event-art-mark"><Icon size={compact ? 26 : 42} /></div>
+      <span><Icon size={16} /> {event.label}</span>
+      <i aria-hidden="true" />
+    </div>
   )
 }
 
