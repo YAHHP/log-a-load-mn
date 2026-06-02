@@ -48,6 +48,7 @@ const events = [
   {
     id: 'mud-fest',
     label: 'Mud Fest Hillman',
+    pagePath: '/mudfest',
     date: 'Memorial & Labor Day 2026',
     location: 'Hillman, Minnesota',
     status: 'Registration open',
@@ -59,12 +60,19 @@ const events = [
     audience: 'Families, truck fans, campers',
     impact: 'Tickets + donations feed the launch charity lane.',
     actionLabel: 'Open Mud Fest page',
+    hostUrl: 'https://mudfesthillman.com',
+    hostLabel: 'Official Mud Fest site',
+    hostNote: 'Host event site for full Mud Fest background.',
+    qrImage: 'qr-mudfest.svg',
+    eventDayNote: 'Bring hosted payment receipt to gate check-in. Camping, pit pass, and kids-ticket wording still need final approval.',
+    reportNote: 'Launch-event report will show tickets sold, donations by fund, sponsor support, and event photos after Mud Fest.',
     summary: 'Log A Load charity ticketing and donation lane for Mud Fest: food, trucks, beer gardens, camping, pits, kids tickets, and fund selection.',
     schedule: ['Gates Friday 8:00 AM', 'Food trucks + vendors', 'Beer garden', 'Camping + pit access'],
   },
   {
     id: 'truck-pull',
     label: 'Truck Pull',
+    pagePath: '/events/truck-pull',
     date: 'Future 2026',
     location: 'Minnesota event site TBD',
     status: 'Planning',
@@ -75,13 +83,20 @@ const events = [
     icon: Tractor,
     audience: 'Drivers, crews, sponsors',
     impact: 'A future event template for classes, tickets, vendors, and check-in.',
-    actionLabel: 'Preview ticket flow',
+    actionLabel: 'Open Truck Pull page',
+    hostUrl: '',
+    hostLabel: 'Official truck pull site pending',
+    hostNote: 'Add host website once the Minnesota site/date is approved.',
+    qrImage: 'qr-register.svg',
+    eventDayNote: 'Future event-day mode should show class check-in, driver queue, safety rules, and rain/weather alerts.',
+    reportNote: 'Truck Pull report can show puller count, class entries, pit pass sales, sponsor value, and charity total.',
     summary: 'Event registration, class rules, tickets, vendors, sponsors, and event-day check-in.',
     schedule: ['Vendor row opens', 'Participant check-in', 'Opening ceremony', 'Classes begin'],
   },
   {
     id: 'golf-classic',
     label: 'Golf Classic',
+    pagePath: '/events/golf-classic',
     date: 'Future 2026',
     location: 'Northwoods Golf Club',
     status: 'Draft',
@@ -92,7 +107,13 @@ const events = [
     icon: Trophy,
     audience: 'Teams, hole sponsors, donors',
     impact: 'A clean hub for teams, sponsor tiers, banquet tickets, and raffle funds.',
-    actionLabel: 'Preview sponsor flow',
+    actionLabel: 'Open Golf Classic page',
+    hostUrl: '',
+    hostLabel: 'Official golf page pending',
+    hostNote: 'Add course/event page once team pricing and sponsor packages are approved.',
+    qrImage: 'qr-register.svg',
+    eventDayNote: 'Golf event-day mode should show team check-in, sponsor table notes, raffle/dinner details, and weather updates.',
+    reportNote: 'Golf report can show teams, hole sponsors, raffle donations, banquet tickets, and final event impact.',
     summary: 'Teams, hole sponsors, banquet tickets, raffle donations, and sponsor recognition.',
     schedule: ['Team check-in', 'Shotgun start', 'Lunch', 'Awards and raffle'],
   },
@@ -196,6 +217,40 @@ const qrTargets = [
   { image: 'qr-tickets.svg', label: 'Buy tickets', path: '/tickets', url: `${publicSiteUrl}#/tickets`, icon: Ticket, detail: 'General admission, kids, pit pass, and camping lanes.' },
   { image: 'qr-donate.svg', label: 'Donate', path: '/donate', url: `${publicSiteUrl}#/donate`, icon: BadgeDollarSign, detail: 'Pick the fund before going to hosted checkout.' },
   { image: 'qr-register.svg', label: 'Register', path: '/register', url: `${publicSiteUrl}#/register`, icon: ClipboardList, detail: 'Volunteer, puller, golfer, crew, vendor, or sponsor intake.' },
+]
+
+const qrKitTargets = [
+  ...qrTargets,
+  { image: 'qr-vendors.svg', label: 'Vendors + sponsors', path: '/vendors', url: `${publicSiteUrl}#/vendors`, icon: Store, detail: 'Vendor, food truck, booth, and sponsor interest.' },
+  { image: 'qr-event-day.svg', label: 'Event-day mode', path: '/event-day', url: `${publicSiteUrl}#/event-day`, icon: Gauge, detail: 'Check-in, receipt, camping, pit pass, weather, and contact help.' },
+]
+
+const eventDayCards = [
+  { icon: ReceiptText, title: 'Show receipt', detail: 'Open the success/receipt screen or payment provider email before reaching the gate.', action: 'Open receipt preview', path: '/success?flow=tickets&method=PayPal&preview=true&total=$15' },
+  { icon: Ticket, title: 'Gate check-in', detail: 'Have buyer name, email receipt, ticket type, and camping/pit pass notes ready for staff.', action: 'Buy or review tickets', path: '/tickets' },
+  { icon: Mountain, title: 'Camping + pit pass', detail: 'Show camping and pit rules before visitors ask at the line. Final wording still needs approval.', action: 'Read rules', path: '/faq' },
+  { icon: Mail, title: 'Event help', detail: 'Route payment issues, vendor arrival questions, and check-in questions to the event team.', action: 'Contact team', path: '/faq' },
+]
+
+const sponsorDirectory = [
+  { name: 'Mud Fest Hillman', tier: 'Host event partner', event: 'Mud Fest Hillman', status: 'Featured', url: 'https://mudfesthillman.com', detail: 'Host event website and primary Mud Fest reference.' },
+  { name: 'North Star Logging', tier: 'Hole sponsor', event: 'Golf Classic', status: 'Invoice', url: '', detail: 'Demo sponsor row for golf fundraiser packages.' },
+  { name: 'Food truck lane', tier: 'Vendor row', event: 'Mud Fest Hillman', status: 'Open', url: '', detail: 'Public vendor directory can list menu, booth needs, and arrival window.' },
+  { name: 'Title Charity Sponsor', tier: '$1,000+ package', event: 'All events', status: 'Available', url: '', detail: 'Premium sponsor placement across event page, QR booth, and thank-you recap.' },
+]
+
+const impactReportMetrics = [
+  { label: 'Raised so far', value: '$12,640', detail: 'Prototype launch metric until real payment records connect.' },
+  { label: 'Tickets modeled', value: '1,263', detail: 'Frontend inventory demo across GA, kids, pit, and camping.' },
+  { label: 'Fund lanes', value: '4', detail: 'Mud Fest, CMN, local family support, and general giving.' },
+  { label: 'After-event recap', value: 'Ready', detail: 'Photos, sponsor thanks, and final fund totals can publish here.' },
+]
+
+const thankYouWall = [
+  'Miller Family',
+  'Anonymous donor',
+  'North Star Logging',
+  'Log A Load booth volunteers',
 ]
 
 const participantOptions = [
@@ -306,6 +361,10 @@ const pageSignals = {
 
 const donationPresets = ['$25', '$50', '$100', '$250']
 
+function getEventByPath(path) {
+  return events.find((event) => event.pagePath === path)
+}
+
 const ticketInventory = ticketOptions.map((ticket) => {
   const remaining = ticket.capacity - ticket.sold
   const percentSold = Math.round((ticket.sold / ticket.capacity) * 100)
@@ -372,6 +431,7 @@ function App() {
   const [selectedTicket, setSelectedTicket] = useState(ticketOptions[0])
   const [selectedPayment, setSelectedPayment] = useState(paymentMethods[0])
   const [ticketQuantities, setTicketQuantities] = useState({ general: 1, kids: 0, pit: 0, camping: 0 })
+  const routedEvent = getEventByPath(route)
 
   useEffect(() => {
     const onHashChange = () => {
@@ -444,7 +504,10 @@ function App() {
       <main>
         {route === '/' && <HomePage metrics={metrics} go={go} />}
         {route === '/mudfest' && <MudFestPage go={go} />}
+        {routedEvent && route !== '/mudfest' && <EventDetailPage event={routedEvent} go={go} />}
         {route === '/events' && <EventsPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} go={go} />}
+        {route === '/event-day' && <EventDayPage go={go} />}
+        {route === '/qr-kit' && <QrKitPage go={go} />}
         {route === '/donate' && <DonatePage selectedFund={selectedFund} setSelectedFund={setSelectedFund} selectedPayment={selectedPayment} setSelectedPayment={setSelectedPayment} handleHostedPayment={handleHostedPayment} />}
         {route === '/tickets' && <TicketsPage selectedTicket={selectedTicket} setSelectedTicket={setSelectedTicket} selectedPayment={selectedPayment} setSelectedPayment={setSelectedPayment} ticketQuantities={ticketQuantities} updateTicketQuantity={updateTicketQuantity} handleHostedPayment={handleHostedPayment} />}
         {(route === '/register' || route === '/participants' || route === '/pullers') && <ParticipantsPage handleSubmit={handleSubmit} />}
@@ -459,7 +522,13 @@ function App() {
 }
 
 function Header({ route, mobileOpen, setMobileOpen }) {
-  const activeRoute = route === '/mudfest' ? '/events' : route === '/pullers' || route === '/participants' ? '/register' : route
+  const activeRoute = route === '/mudfest' || route.startsWith('/events/') || route === '/event-day'
+    ? '/events'
+    : route === '/pullers' || route === '/participants'
+      ? '/register'
+      : route === '/qr-kit'
+        ? '/'
+        : route
 
   return (
     <header className="site-header">
@@ -541,6 +610,8 @@ function HomePage({ metrics, go }) {
             <a href="#/donate"><BadgeDollarSign size={17} /> Choose fund</a>
             <a href="#/events"><CalendarDays size={17} /> Event center</a>
             <a href="#/register"><ClipboardList size={17} /> Register</a>
+            <a href="#/event-day"><Gauge size={17} /> Event-day</a>
+            <a href="#/qr-kit"><QrCode size={17} /> QR kit</a>
             <a href="#/faq"><FileText size={17} /> Rules</a>
           </div>
         </aside>
@@ -591,6 +662,7 @@ function HomePage({ metrics, go }) {
       <TrustFlow />
       <CheckoutArchitecture />
       <ImpactLedger go={go} />
+      <ImpactReportSection />
       <ReviewSection />
     </>
   )
@@ -654,8 +726,10 @@ function MudFestPage({ go }) {
           <div className="hero-actions">
             <button className="primary-button large" type="button" onClick={() => go('/tickets')}>Buy Mud Fest tickets</button>
             <button className="secondary-button large" type="button" onClick={() => go('/donate')}>Donate to a fund</button>
+            <button className="secondary-button large" type="button" onClick={() => go('/event-day')}>Event-day mode</button>
             <button className="secondary-button large" type="button" onClick={() => go('/faq')}>Rules + contact</button>
           </div>
+          <EventActionPanel event={events[0]} go={go} compact />
         </div>
       </section>
 
@@ -693,6 +767,9 @@ function MudFestPage({ go }) {
           </div>
         </div>
       </section>
+      <MoneyClaritySection />
+      <SponsorDirectory />
+      <ImpactReportSection event={events[0]} />
     </>
   )
 }
@@ -715,8 +792,9 @@ function EventNetwork({ go }) {
       <div className="network-grid" aria-label="Event platform examples">
         {eventNetwork.map((item) => {
           const Icon = item.icon
+          const matchingEvent = events.find((event) => event.label === item.title)
           return (
-            <button type="button" key={item.title} onClick={() => go('/events')}>
+            <button type="button" key={item.title} onClick={() => go(matchingEvent?.pagePath || '/events')}>
               <Icon size={24} />
               <span>{item.status}</span>
               <strong>{item.title}</strong>
@@ -860,11 +938,13 @@ function EventsPage({ selectedEvent, setSelectedEvent, go }) {
               return <div key={item}><strong>{time}</strong><span>{rest.join(' ')}</span></div>
             })}
           </div>
+          <EventActionPanel event={selectedEvent} go={go} compact />
           <div className="hero-actions">
-            <button className="primary-button" type="button" onClick={() => go(selectedEvent.id === 'mud-fest' ? '/mudfest' : selectedEvent.id === 'golf-classic' ? '/vendors' : '/tickets')}>{selectedEvent.actionLabel}</button>
+            <button className="primary-button" type="button" onClick={() => go(selectedEvent.pagePath)}>{selectedEvent.actionLabel}</button>
             <button className="secondary-button" type="button" onClick={() => go('/tickets')}>Tickets</button>
             <button className="secondary-button" type="button" onClick={() => go('/register')}>Event registration</button>
             <button className="secondary-button" type="button" onClick={() => go('/donate')}>Donate to this event</button>
+            <button className="secondary-button" type="button" onClick={() => go('/qr-kit')}>QR kit</button>
           </div>
         </div>
       </section>
@@ -947,6 +1027,225 @@ function EventVisual({ event, compact = false }) {
   )
 }
 
+function HostSiteAction({ event }) {
+  if (!event.hostUrl) {
+    return (
+      <span className="host-link pending">
+        <Globe2 size={17} />
+        <strong>{event.hostLabel}</strong>
+        <small>{event.hostNote}</small>
+      </span>
+    )
+  }
+
+  return (
+    <a className="host-link" href={event.hostUrl} target="_blank" rel="noreferrer">
+      <Globe2 size={17} />
+      <strong>{event.hostLabel}</strong>
+      <small>{event.hostNote}</small>
+    </a>
+  )
+}
+
+function EventActionPanel({ event, go, compact = false }) {
+  return (
+    <div className={compact ? 'event-action-panel compact' : 'event-action-panel'}>
+      <HostSiteAction event={event} />
+      <button type="button" onClick={() => go('/tickets')}><Ticket size={17} /><span>Tickets</span></button>
+      <button type="button" onClick={() => go('/donate')}><BadgeDollarSign size={17} /><span>Donate</span></button>
+      <button type="button" onClick={() => go('/register')}><ClipboardList size={17} /><span>Register</span></button>
+      <button type="button" onClick={() => go('/event-day')}><Gauge size={17} /><span>Event-day mode</span></button>
+      <button type="button" onClick={() => go('/faq')}><FileText size={17} /><span>Rules / FAQ</span></button>
+    </div>
+  )
+}
+
+function EventDetailPage({ event, go }) {
+  const Icon = event.icon || CalendarDays
+  return (
+    <>
+      <PageIntro
+        kicker="Event page"
+        icon={Icon}
+        title={`${event.label} charity command page.`}
+        copy={`${event.summary} This page shows the exact V3 structure each Minnesota fundraiser can receive: host links, tickets, donations, registration, QR tools, sponsors, event-day instructions, and after-event impact.`}
+      />
+      <section className="event-command-page">
+        <div className="event-command-media">
+          <EventVisual event={event} />
+          <div className="event-command-qr">
+            <QrPanel target={{ image: event.qrImage, label: event.label, url: `${publicSiteUrl}#${event.pagePath}` }} />
+          </div>
+        </div>
+        <div className="event-command-copy">
+          <div className="section-kicker"><LayoutDashboard size={16} /> Event command center</div>
+          <h2>{event.label}</h2>
+          <p>{event.impact}</p>
+          <div className="event-stats">
+            <span><strong>{event.goal}</strong> goal</span>
+            <span><strong>{event.raised}</strong> raised</span>
+            <span><strong>{event.status}</strong> status</span>
+          </div>
+          <EventActionPanel event={event} go={go} />
+        </div>
+      </section>
+      <section className="schedule-section">
+        <div>
+          <div className="section-kicker"><CalendarDays size={16} /> Event flow</div>
+          <h2>Draft schedule and operating lanes.</h2>
+          <p>{event.eventDayNote}</p>
+        </div>
+        <div className="schedule-grid">
+          {event.schedule.map((item) => (
+            <div className="schedule-card" key={item}>
+              <strong>{item}</strong>
+              <span>Admin can replace this with event-specific timing, owner, rule notes, and check-in instructions.</span>
+            </div>
+          ))}
+        </div>
+      </section>
+      <SponsorDirectory />
+      <ImpactReportSection event={event} />
+    </>
+  )
+}
+
+function EventDayPage({ go }) {
+  return (
+    <>
+      <PageIntro
+        kicker="Event-day mode"
+        icon={Gauge}
+        title="A phone-first command page for the day of the event."
+        copy="This is the page a visitor or staff member can open from a QR sign at the gate. It should answer receipt, check-in, camping, pit pass, weather, and contact questions without hunting through the whole website."
+      />
+      <section className="event-day-layout">
+        <div className="event-day-phone">
+          <div className="section-kicker"><QrCode size={16} /> Live QR target</div>
+          <h2>Mud Fest event-day help</h2>
+          <QrPanel target={qrKitTargets.find((target) => target.path === '/event-day')} />
+          <div className="event-day-status">
+            <span><strong>Gate status</strong> Prototype ready</span>
+            <span><strong>Weather banner</strong> Connect before launch</span>
+            <span><strong>Help desk</strong> Contact form for v1</span>
+          </div>
+        </div>
+        <div className="event-day-actions">
+          {eventDayCards.map((card) => {
+            const Icon = card.icon
+            return (
+              <button type="button" onClick={() => go(card.path)} key={card.title}>
+                <Icon size={22} />
+                <span>{card.title}</span>
+                <strong>{card.detail}</strong>
+                <small>{card.action}</small>
+              </button>
+            )
+          })}
+        </div>
+      </section>
+      <MoneyClaritySection />
+    </>
+  )
+}
+
+function QrKitPage({ go }) {
+  return (
+    <>
+      <PageIntro
+        kicker="QR print kit"
+        icon={QrCode}
+        title="Every flyer, sign, and booth gets the right QR code."
+        copy="This turns QR from a single homepage gimmick into an operating tool. Admins can print different codes for tickets, donations, registration, vendors, and event-day help."
+      />
+      <section className="qr-kit-grid">
+        {qrKitTargets.map((target) => <QrKitCard target={target} go={go} key={target.label} />)}
+      </section>
+    </>
+  )
+}
+
+function QrKitCard({ target, go }) {
+  const Icon = target.icon
+  return (
+    <div className="qr-kit-card">
+      <img src={assetPath(target.image)} alt={`QR code for ${target.label}`} loading="eager" decoding="async" />
+      <div>
+        <div className="section-kicker"><Icon size={16} /> {target.label}</div>
+        <h2>{target.label}</h2>
+        <p>{target.detail}</p>
+        <small>{target.url}</small>
+      </div>
+      <div className="hero-actions">
+        <button className="primary-button" type="button" onClick={() => go(target.path)}>Open page</button>
+        <a className="secondary-button" href={assetPath(target.image)} download>Download SVG</a>
+      </div>
+    </div>
+  )
+}
+
+function MoneyClaritySection() {
+  return (
+    <section className="money-clarity-section">
+      <div>
+        <div className="section-kicker"><ShieldCheck size={16} /> Money clarity</div>
+        <h2>Trust is the product.</h2>
+        <p>Before this takes real money, visitors need clear fund ownership, hosted payment receipts, refund/weather wording, and a payment-problem contact path.</p>
+      </div>
+      <div className="money-clarity-grid">
+        <span><strong>Receiver</strong>Log A Load Minnesota or the approved fiscal host owns payment accounts.</span>
+        <span><strong>Fund selected</strong>Donors choose Mud Fest, CMN, local support, or where it helps most.</span>
+        <span><strong>Receipt</strong>PayPal or Stripe sends the payment receipt; this site returns a confirmation page.</span>
+        <span><strong>Issue path</strong>FAQ/contact form routes buyer, vendor, camping, pit pass, and payment questions.</span>
+      </div>
+    </section>
+  )
+}
+
+function SponsorDirectory() {
+  return (
+    <section className="sponsor-directory">
+      <div>
+        <div className="section-kicker"><Store size={16} /> Sponsor + vendor directory</div>
+        <h2>Make partners feel worth clicking.</h2>
+        <p>Sponsors and vendors should not look like footnotes. Give them tier, event, status, website, and a short reason people should care.</p>
+      </div>
+      <div className="sponsor-directory-grid">
+        {sponsorDirectory.map((sponsor) => (
+          <div className="sponsor-directory-card" key={sponsor.name}>
+            <span>{sponsor.status}</span>
+            <strong>{sponsor.name}</strong>
+            <small>{sponsor.tier} - {sponsor.event}</small>
+            <p>{sponsor.detail}</p>
+            {sponsor.url ? <a href={sponsor.url} target="_blank" rel="noreferrer">Visit website</a> : <em>Website pending</em>}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ImpactReportSection({ event = events[0] }) {
+  return (
+    <section className="impact-report-section">
+      <div>
+        <div className="section-kicker"><HeartPulse size={16} /> After-event impact</div>
+        <h2>Turn every fundraiser into proof for the next one.</h2>
+        <p>{event.reportNote}</p>
+      </div>
+      <div className="impact-report-grid">
+        {impactReportMetrics.map((metric) => (
+          <span key={metric.label}><strong>{metric.value}</strong>{metric.label}<small>{metric.detail}</small></span>
+        ))}
+      </div>
+      <div className="thank-you-wall">
+        <strong>Thank-you wall preview</strong>
+        {thankYouWall.map((name) => <span key={name}>{name}</span>)}
+      </div>
+    </section>
+  )
+}
+
 function DonatePage({ selectedFund, setSelectedFund, selectedPayment, setSelectedPayment, handleHostedPayment }) {
   const [donationAmount, setDonationAmount] = useState('$100')
 
@@ -1001,6 +1300,7 @@ function DonatePage({ selectedFund, setSelectedFund, selectedPayment, setSelecte
           <button className="primary-button full" type="submit">Continue with {selectedPayment.label}</button>
         </form>
       </section>
+      <MoneyClaritySection />
     </>
   )
 }
@@ -1076,6 +1376,7 @@ function TicketsPage({ selectedTicket, setSelectedTicket, selectedPayment, setSe
           <small className="form-note">If hosted payment links are not configured yet, this button opens the local confirmation preview.</small>
         </form>
       </section>
+      <MoneyClaritySection />
     </>
   )
 }
@@ -1170,6 +1471,7 @@ function VendorsPage({ handleSubmit }) {
           <button className="primary-button full" type="submit">Send vendor request</button>
         </form>
       </section>
+      <SponsorDirectory />
     </>
   )
 }

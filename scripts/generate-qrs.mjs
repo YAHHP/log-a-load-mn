@@ -8,6 +8,8 @@ const targets = [
   ['qr-tickets.svg', `${baseUrl}#/tickets`],
   ['qr-donate.svg', `${baseUrl}#/donate`],
   ['qr-register.svg', `${baseUrl}#/register`],
+  ['qr-vendors.svg', `${baseUrl}#/vendors`],
+  ['qr-event-day.svg', `${baseUrl}#/event-day`],
 ]
 
 await Promise.all(targets.map(([file, url]) => QRCode.toFile(`public/${file}`, url, {

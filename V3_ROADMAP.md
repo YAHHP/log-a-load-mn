@@ -2,6 +2,20 @@
 
 V3 should turn this from a polished prototype into a launchable event operating system.
 
+## Static V3 Prototype Layer
+
+The frontend prototype now includes the operational surfaces that should exist before a backend is connected:
+
+- Clickable event pages for Mud Fest, Truck Pull, and Golf Classic.
+- Official host-site link slots on event pages.
+- Event-day mode for receipt, gate, camping/pit, weather/update, and contact help.
+- QR print kit for event, tickets, donations, registration, vendors, and event-day mode.
+- Money clarity section for receiver, fund, receipt, and payment issue paths.
+- Sponsor/vendor directory structure.
+- After-event impact report preview with metrics and thank-you wall.
+
+These are static/demo surfaces today. They become production features once connected to real records, auth, payment links, and admin workflows.
+
 ## Product Direction
 
 Log A Load MN is the charity ticketing and donation layer for Minnesota events. It should not replace host event websites. It should make QR-code visitors able to buy, donate, register, sponsor, and get a receipt without confusion.

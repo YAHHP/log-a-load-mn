@@ -9,12 +9,16 @@ The product direction is a multi-event charity hub, not a single truck-pull page
 - Home: QR-friendly landing page and cause positioning
 - Events: multi-event center for Mud Fest, truck pull, golf, and future fundraisers
 - Mud Fest: featured event page at `#/mudfest`
+- Truck Pull: draft event page at `#/events/truck-pull`
+- Golf Classic: draft event page at `#/events/golf-classic`
 - Tickets: Mud Fest v1 order builder with hosted checkout handoff
 - Donate: fund-specific donation path
 - Register: event-role signup for volunteers, competitors, golfers, sponsor reps, crew, and future event roles
 - Vendors: vendors and sponsor interest form
 - FAQ: rules, payment safety, contact form, and launch notes
 - Success: receipt-style return page for hosted checkout
+- Event Day: phone-first check-in/help mode at `#/event-day`
+- QR Kit: print/download QR code hub at `#/qr-kit`
 - Admin: locked public route with a local/demo-only dashboard blueprint for analytics, event edits, exports, ticket inventory, fund setup, and payment configuration
 
 Legacy local links `#/participants` and `#/pullers` still render the Register page so old review links do not break.
@@ -38,11 +42,15 @@ Common routes:
 http://127.0.0.1:5177/#/
 http://127.0.0.1:5177/#/events
 http://127.0.0.1:5177/#/mudfest
+http://127.0.0.1:5177/#/events/truck-pull
+http://127.0.0.1:5177/#/events/golf-classic
 http://127.0.0.1:5177/#/tickets
 http://127.0.0.1:5177/#/donate
 http://127.0.0.1:5177/#/register
 http://127.0.0.1:5177/#/vendors
 http://127.0.0.1:5177/#/faq
+http://127.0.0.1:5177/#/event-day
+http://127.0.0.1:5177/#/qr-kit
 http://127.0.0.1:5177/#/admin
 ```
 
@@ -94,6 +102,8 @@ Current generated targets:
 - `public/qr-tickets.svg` -> `https://yahhp.github.io/log-a-load-mn/#/tickets`
 - `public/qr-donate.svg` -> `https://yahhp.github.io/log-a-load-mn/#/donate`
 - `public/qr-register.svg` -> `https://yahhp.github.io/log-a-load-mn/#/register`
+- `public/qr-vendors.svg` -> `https://yahhp.github.io/log-a-load-mn/#/vendors`
+- `public/qr-event-day.svg` -> `https://yahhp.github.io/log-a-load-mn/#/event-day`
 
 ## Mud Fest Ticket Assumptions
 
@@ -121,6 +131,7 @@ Keep the public website static and CDN-backed for heavy QR/event traffic.
 - Use CSV export for first event check-in, then add barcode/QR scanning later.
 - Use GitHub Pages for a public demo URL only; move to Vercel/Netlify plus auth/backend before giving admins real edit power.
 - Ticket availability warnings are modeled in the frontend, but real sold-out protection requires provider limits or a database-backed checkout flow.
+- GitHub Pages is fine for early static QR traffic and feedback review. It is not enough for protected admin editing, payment webhooks, real inventory locks, or durable order records.
 
 See `LAUNCH_CHECKLIST.md` and `SECURITY_NOTES.md` for the launch handoff.
 

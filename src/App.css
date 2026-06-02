@@ -2941,6 +2941,315 @@ textarea {
   margin-top: 2px;
 }
 
+.event-command-page,
+.event-day-layout,
+.money-clarity-section,
+.sponsor-directory,
+.impact-report-section {
+  display: grid;
+  grid-template-columns: minmax(0, 0.78fr) minmax(360px, 1fr);
+  gap: clamp(24px, 5vw, 72px);
+  align-items: start;
+  padding: clamp(48px, 7vw, 88px) clamp(18px, 5vw, 72px);
+}
+
+.event-command-page,
+.money-clarity-section,
+.impact-report-section {
+  background: #f4efe2;
+}
+
+.event-command-media {
+  display: grid;
+  gap: 14px;
+}
+
+.event-command-qr {
+  max-width: 360px;
+}
+
+.event-command-copy h2,
+.event-day-phone h2,
+.money-clarity-section h2,
+.sponsor-directory h2,
+.impact-report-section h2 {
+  margin: 10px 0 12px;
+  color: #17211b;
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.event-command-copy p,
+.money-clarity-section p,
+.sponsor-directory p,
+.impact-report-section p {
+  color: #5f635c;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.event-action-panel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.event-action-panel.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.event-action-panel button,
+.host-link {
+  display: grid;
+  gap: 5px;
+  align-content: start;
+  min-height: 86px;
+  padding: 12px;
+  border: 1px solid rgba(29, 37, 32, 0.12);
+  border-radius: 8px;
+  color: #25352c;
+  background: #fffdf6;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.event-action-panel button:hover,
+.host-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(194, 79, 25, 0.28);
+}
+
+.host-link {
+  grid-column: 1 / -1;
+}
+
+.host-link svg,
+.event-action-panel svg {
+  color: #c24f19;
+}
+
+.host-link strong,
+.event-action-panel span {
+  color: #17211b;
+  font-weight: 900;
+}
+
+.host-link small {
+  color: #626960;
+  line-height: 1.35;
+}
+
+.host-link.pending {
+  border-style: dashed;
+  background: #f8efe0;
+}
+
+.event-day-layout {
+  background:
+    linear-gradient(120deg, rgba(7, 18, 12, 0.96), rgba(24, 49, 33, 0.86)),
+    linear-gradient(90deg, #07120c, #6a3a1e);
+}
+
+.event-day-phone {
+  display: grid;
+  gap: 14px;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(255, 248, 235, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 248, 235, 0.94);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.18);
+}
+
+.event-day-status {
+  display: grid;
+  gap: 8px;
+}
+
+.event-day-status span,
+.money-clarity-grid span,
+.impact-report-grid span {
+  display: grid;
+  gap: 4px;
+  padding: 13px;
+  border: 1px solid rgba(29, 37, 32, 0.1);
+  border-radius: 8px;
+  background: #fffaf0;
+  color: #25352c;
+}
+
+.event-day-status strong,
+.money-clarity-grid strong {
+  color: #b94e1b;
+}
+
+.event-day-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.event-day-actions button {
+  display: grid;
+  gap: 8px;
+  min-height: 190px;
+  padding: 17px;
+  border: 1px solid rgba(255, 248, 235, 0.16);
+  border-radius: 8px;
+  color: #fff8eb;
+  background: rgba(255, 248, 235, 0.08);
+  text-align: left;
+  cursor: pointer;
+}
+
+.event-day-actions svg,
+.event-day-actions small {
+  color: #ffd391;
+}
+
+.event-day-actions span {
+  color: #ffd391;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.event-day-actions strong {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.qr-kit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding: clamp(42px, 6vw, 78px) clamp(18px, 5vw, 72px);
+  background: #f4efe2;
+}
+
+.qr-kit-card {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 18px;
+  border: 1px solid rgba(29, 37, 32, 0.11);
+  border-radius: 8px;
+  background: #fffaf0;
+  box-shadow: 0 18px 42px rgba(35, 53, 42, 0.08);
+}
+
+.qr-kit-card img {
+  width: 150px;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.qr-kit-card h2 {
+  margin: 8px 0;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.qr-kit-card p,
+.qr-kit-card small {
+  color: #626960;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.money-clarity-grid,
+.impact-report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sponsor-directory {
+  background: #fff8e9;
+}
+
+.sponsor-directory-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sponsor-directory-card {
+  display: grid;
+  gap: 7px;
+  min-height: 190px;
+  padding: 16px;
+  border: 1px solid rgba(29, 37, 32, 0.1);
+  border-radius: 8px;
+  background: #fffdf6;
+  box-shadow: 0 18px 42px rgba(35, 53, 42, 0.08);
+}
+
+.sponsor-directory-card span {
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #183024;
+  background: #ffd391;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.sponsor-directory-card strong {
+  font-size: 22px;
+}
+
+.sponsor-directory-card small,
+.sponsor-directory-card p,
+.sponsor-directory-card em {
+  color: #626960;
+  line-height: 1.4;
+}
+
+.sponsor-directory-card a {
+  color: #b94e1b;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.impact-report-section {
+  grid-template-columns: minmax(0, 0.65fr) minmax(320px, 0.8fr) minmax(260px, 0.5fr);
+}
+
+.impact-report-grid strong {
+  color: #c24f19;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.impact-report-grid small {
+  color: #626960;
+  line-height: 1.35;
+}
+
+.thank-you-wall {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 8px;
+  color: #fff8eb;
+  background: #17211b;
+}
+
+.thank-you-wall strong {
+  color: #ffd391;
+}
+
+.thank-you-wall span {
+  padding: 9px 10px;
+  border-radius: 7px;
+  background: rgba(255, 248, 235, 0.08);
+}
+
 .site-footer {
   display: flex;
   align-items: center;
@@ -2999,6 +3308,11 @@ textarea {
   }
 
   .hero-section,
+  .event-command-page,
+  .event-day-layout,
+  .money-clarity-section,
+  .sponsor-directory,
+  .impact-report-section,
   .event-brief,
   .rules-section,
   .mudfest-showcase,
@@ -3047,6 +3361,12 @@ textarea {
 
   .scan-actions,
   .qr-action-grid,
+  .event-action-panel,
+  .event-day-actions,
+  .qr-kit-grid,
+  .money-clarity-grid,
+  .sponsor-directory-grid,
+  .impact-report-grid,
   .traffic-grid,
   .inventory-grid,
   .schedule-grid,
@@ -3090,6 +3410,11 @@ textarea {
   }
 
   .metrics-band,
+  .event-command-page,
+  .event-day-layout,
+  .money-clarity-section,
+  .sponsor-directory,
+  .impact-report-section,
   .event-brief,
   .rules-section,
   .success-layout,
@@ -3099,6 +3424,7 @@ textarea {
   .home-action-strip,
   .scan-actions,
   .qr-action-grid,
+  .qr-kit-grid,
   .mudfest-showcase,
   .schedule-section,
   .schedule-grid,
@@ -3150,6 +3476,24 @@ textarea {
   .payment-grid,
   .two-col {
     grid-template-columns: 1fr;
+  }
+
+  .event-action-panel,
+  .event-action-panel.compact,
+  .event-day-actions,
+  .money-clarity-grid,
+  .sponsor-directory-grid,
+  .impact-report-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qr-kit-card {
+    grid-template-columns: 1fr;
+  }
+
+  .qr-kit-card img {
+    width: min(220px, 100%);
+    justify-self: center;
   }
 
   .hero-signal-row {
