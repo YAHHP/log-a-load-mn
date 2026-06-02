@@ -7,6 +7,7 @@
 - Ticket and donation payments redirect to hosted PayPal, Stripe, or Venmo URLs.
 - This frontend does not collect card numbers, store payment credentials, or process card data.
 - Payment URL env vars are public checkout links only. They are not secrets.
+- The public Admin nav is hidden and direct public admin access shows a locked handoff screen.
 
 ## Frontend Payment Guardrails
 
@@ -25,9 +26,11 @@ If a link is not configured or fails validation, the checkout button falls back 
 ## Not Production-Secure Yet
 
 - The Admin page is a preview. It is not real authentication or authorization.
+- `VITE_ENABLE_ADMIN_DEMO` and `VITE_ADMIN_DEMO_CODE` are demo-only frontend switches. They should not be treated as secrets or production protection.
 - The CSV exports currently use demo rows.
 - Forms currently show local confirmation UI and need real serverless handlers or backend routes.
 - Payment reconciliation needs provider webhooks before final accounting.
+- Ticket inventory warnings currently use demo/static numbers. Real capacity enforcement needs provider limits or a backend database updated after confirmed payments.
 - Do not add secrets to `.env.local` if the value starts with `sk_`, contains `secret`, or belongs on a server.
 
 ## Recommended Production Controls

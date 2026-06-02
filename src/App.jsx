@@ -11,6 +11,7 @@ import {
   Edit3,
   FileText,
   Gauge,
+  Globe2,
   HandHeart,
   HeartPulse,
   LayoutDashboard,
@@ -41,7 +42,6 @@ const routes = [
   { path: '/register', label: 'Register' },
   { path: '/vendors', label: 'Vendors' },
   { path: '/faq', label: 'FAQ' },
-  { path: '/admin', label: 'Admin' },
 ]
 
 const events = [
@@ -88,11 +88,14 @@ const funds = [
 ]
 
 const ticketOptions = [
-  { id: 'general', amount: 15, price: '$15', label: 'General admission', note: 'Mud Fest entry ticket through the Log A Load charity lane.' },
-  { id: 'kids', amount: 5, price: '$5', label: 'Kids 12 and under', note: 'Confirm final wording before launch.' },
-  { id: 'pit', amount: 20, price: '$20', label: 'Pit pass', note: 'Closer access to the action; must follow event safety rules.' },
-  { id: 'camping', amount: 40, price: '$40', label: 'Camping pass', note: 'Per camper. Confirm whether admission is included.' },
+  { id: 'general', amount: 15, capacity: 1500, sold: 842, price: '$15', label: 'General admission', note: 'Mud Fest entry ticket through the Log A Load charity lane.' },
+  { id: 'kids', amount: 5, capacity: 500, sold: 188, price: '$5', label: 'Kids 12 and under', note: 'Confirm final wording before launch.' },
+  { id: 'pit', amount: 20, capacity: 220, sold: 171, price: '$20', label: 'Pit pass', note: 'Closer access to the action; must follow event safety rules.' },
+  { id: 'camping', amount: 40, capacity: 80, sold: 62, price: '$40', label: 'Camping pass', note: 'Per camper. Confirm whether admission is included.' },
 ]
+
+const adminPreviewEnabled = import.meta.env.DEV || import.meta.env.VITE_ENABLE_ADMIN_DEMO === 'true'
+const adminDemoCode = import.meta.env.VITE_ADMIN_DEMO_CODE || 'logaload-preview'
 
 const paymentMethods = [
   { id: 'paypal', label: 'PayPal', note: 'Recommended v1: hosted link or button owned by Log A Load.' },
@@ -235,6 +238,18 @@ const trafficMetrics = [
   { label: 'Admin exports', value: '4', detail: 'Orders, tickets, funds, vendors' },
 ]
 
+const ticketInventory = ticketOptions.map((ticket) => {
+  const remaining = ticket.capacity - ticket.sold
+  const percentSold = Math.round((ticket.sold / ticket.capacity) * 100)
+  return { ...ticket, remaining, percentSold }
+})
+
+const checkoutPlan = [
+  { title: 'Hosted checkout now', detail: 'PayPal or Stripe Payment Links can accept the money without this site touching card data.' },
+  { title: 'Inventory needs records', detail: 'Low-ticket warnings and sold-out locks need a database or provider inventory limit, plus payment webhooks.' },
+  { title: 'Admin reconciles daily', detail: 'Orders, funds, tickets, vendor forms, and payment reports should export cleanly for check-in.' },
+]
+
 function getRoute() {
   const hash = window.location.hash.replace('#', '')
   const normalized = hash.startsWith('/') ? hash : '/'
@@ -259,6 +274,10 @@ function formatMoney(amount) {
 
 function getTicketTotal(ticketQuantities) {
   return ticketOptions.reduce((total, ticket) => total + (ticketQuantities[ticket.id] || 0) * ticket.amount, 0)
+}
+
+function getTicketRemaining(ticketId) {
+  return ticketInventory.find((ticket) => ticket.id === ticketId)?.remaining ?? 999
 }
 
 function exportCsv(filename, rows) {
@@ -323,7 +342,7 @@ function App() {
   }
 
   function updateTicketQuantity(ticketId, value) {
-    const quantity = Math.max(0, Number(value) || 0)
+    const quantity = Math.min(getTicketRemaining(ticketId), Math.max(0, Number(value) || 0))
     setTicketQuantities((current) => ({ ...current, [ticketId]: quantity }))
   }
 
@@ -391,7 +410,6 @@ function Header({ route, mobileOpen, setMobileOpen }) {
         ))}
       </nav>
       <div className="header-actions">
-        <a className="ghost-button" href="#/admin">Admin</a>
         <a className="primary-button" href="#/donate">Donate</a>
         <button className="icon-button" type="button" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu">
           {mobileOpen ? <X size={20} /> : <Menu size={20} />}
@@ -478,7 +496,9 @@ function HomePage({ metrics, go }) {
 
       <MudFestExperience go={go} />
       <EventNetwork go={go} />
+      <TicketInventoryStrip />
       <TrustFlow />
+      <CheckoutArchitecture />
       <ImpactLedger go={go} />
       <ReviewSection />
     </>
@@ -497,7 +517,7 @@ function MudFestExperience({ go }) {
         </p>
         <div className="hero-actions">
           <button className="primary-button large" type="button" onClick={() => go('/tickets')}>Start ticket order</button>
-          <button className="secondary-button large" type="button" onClick={() => go('/admin')}>View admin control</button>
+          <button className="secondary-button large" type="button" onClick={() => go('/events')}>View event center</button>
         </div>
       </div>
       <div className="showcase-board" aria-label="Mud Fest highlights">
@@ -618,6 +638,29 @@ function EventNetwork({ go }) {
   )
 }
 
+function TicketInventoryStrip() {
+  return (
+    <section className="inventory-strip" aria-label="Mud Fest ticket availability">
+      <div>
+        <div className="section-kicker"><Ticket size={16} /> Ticket availability</div>
+        <h2>Show buyers what is still available before they wait in line.</h2>
+      </div>
+      <div className="inventory-grid">
+        {ticketInventory.map((ticket) => (
+          <div className={ticket.remaining <= 25 ? 'inventory-card low' : 'inventory-card'} key={ticket.id}>
+            <span>{ticket.label}</span>
+            <strong>{ticket.remaining} left</strong>
+            <div className="inventory-bar" aria-label={`${ticket.percentSold}% sold`}>
+              <i style={{ width: `${ticket.percentSold}%` }} />
+            </div>
+            <small>{ticket.sold}/{ticket.capacity} sold</small>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function TrustFlow() {
   return (
     <section className="trust-flow">
@@ -634,6 +677,29 @@ function TrustFlow() {
             </div>
           )
         })}
+      </div>
+    </section>
+  )
+}
+
+function CheckoutArchitecture() {
+  return (
+    <section className="checkout-architecture">
+      <div>
+        <div className="section-kicker"><Globe2 size={16} /> Payment + inventory plan</div>
+        <h2>Payments can launch with hosted links. Ticket limits need a real backend.</h2>
+        <p>
+          GitHub Pages is solid for a public demo and static QR traffic. For live ticket caps, admin login, webhooks, and payment reconciliation,
+          the professional path is Vercel or Netlify plus a small database-backed API.
+        </p>
+      </div>
+      <div className="architecture-steps">
+        {checkoutPlan.map((step, index) => (
+          <span key={step.title}>
+            <strong>{index + 1}. {step.title}</strong>
+            <small>{step.detail}</small>
+          </span>
+        ))}
       </div>
     </section>
   )
@@ -765,16 +831,21 @@ function TicketsPage({ selectedTicket, setSelectedTicket, selectedPayment, setSe
       <section className="tickets-page">
         <div className="ticket-stack">
           <div className="ticket-product-grid">
-            {ticketOptions.map((ticket) => (
+            {ticketInventory.map((ticket) => (
               <div className={(ticketQuantities[ticket.id] || 0) > 0 ? 'ticket-product selected' : 'ticket-product'} key={ticket.id}>
                 <button type="button" onClick={() => setSelectedTicket(ticket)}>
                   <strong>{ticket.price}</strong>
                   <span>{ticket.label}</span>
                   <small>{ticket.note}</small>
+                  <em>{ticket.remaining <= 25 ? `Only ${ticket.remaining} left` : `${ticket.remaining} available`}</em>
                 </button>
-                <label>Quantity<input name={`${ticket.id}-quantity`} type="number" min="0" inputMode="numeric" value={ticketQuantities[ticket.id] || 0} onChange={(event) => updateTicketQuantity(ticket.id, event.target.value)} /></label>
+                <label>Quantity<input name={`${ticket.id}-quantity`} type="number" min="0" max={ticket.remaining} inputMode="numeric" value={ticketQuantities[ticket.id] || 0} onChange={(event) => updateTicketQuantity(ticket.id, event.target.value)} /></label>
               </div>
             ))}
+          </div>
+          <div className="ticket-cap-note">
+            <ShieldCheck size={18} />
+            <span>Availability is a launch model right now. Real sold-out protection needs provider inventory limits or a database-backed checkout before taking money.</span>
           </div>
           <div className="event-vibe-card">
             <div><Mountain size={22} /><strong>Mud Fest Hillman</strong></div>
@@ -993,6 +1064,20 @@ function SuccessPage({ go }) {
 }
 
 function AdminPage({ setSelectedEvent, go, handleSubmit }) {
+  const [adminUnlocked, setAdminUnlocked] = useState(false)
+  const [adminCode, setAdminCode] = useState('')
+  const [adminError, setAdminError] = useState('')
+
+  function handleAdminUnlock(event) {
+    event.preventDefault()
+    if (adminCode.trim() === adminDemoCode) {
+      setAdminUnlocked(true)
+      setAdminError('')
+      return
+    }
+    setAdminError('That demo code did not match. For public launch, this needs real server-side authentication.')
+  }
+
   const adminTools = [
     { icon: PlusCircle, title: 'Add event', copy: 'Non-technical event setup wizard for future Mud Fest, truck pull, golf, raffle, or dinner pages.' },
     { icon: Edit3, title: 'Edit content', copy: 'Update hero copy, videos, prices, schedules, sponsor blocks, rules, and QR targets.' },
@@ -1001,6 +1086,35 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
     { icon: Download, title: 'Exports', copy: 'Download CSV lists for gate check-in, vendor setup, donor follow-up, and sponsors.' },
     { icon: ShieldCheck, title: 'Payment control', copy: 'Reconcile Stripe/PayPal sessions with donor records and event funds.' },
   ]
+
+  if (!adminPreviewEnabled) {
+    return <AdminLockedPage go={go} />
+  }
+
+  if (!adminUnlocked) {
+    return (
+      <>
+        <PageIntro kicker="Admin access" icon={LockKeyhole} title="Admin dashboard is locked on the public site." copy="This preview needs an access gate for demo work, and real production needs server-side authentication before admins can edit events, tickets, funds, or exports." />
+        <section className="admin-lock-layout">
+          <form className="form-card admin-lock-card" onSubmit={handleAdminUnlock}>
+            <div className="section-kicker"><ShieldCheck size={16} /> Local demo gate</div>
+            <h2>Enter the admin demo code.</h2>
+            <p>This is only for local or intentionally enabled demo deployments. It is not a replacement for real auth.</p>
+            <label>Demo code<input name="adminCode" type="password" value={adminCode} onChange={(event) => setAdminCode(event.target.value)} placeholder="Ask site owner for code" required /></label>
+            {adminError && <span className="form-error">{adminError}</span>}
+            <button className="primary-button full" type="submit">Open admin preview</button>
+          </form>
+          <div className="admin-lock-card guidance-card">
+            <div className="section-kicker"><Globe2 size={16} /> Professional launch path</div>
+            <h2>Use protected hosting or real auth for production.</h2>
+            <span><CheckCircle2 size={17} /> GitHub Pages is fine for a public brochure/demo.</span>
+            <span><CheckCircle2 size={17} /> Admin editing needs Vercel/Netlify protection, Supabase Auth, Clerk, or another server-backed provider.</span>
+            <span><CheckCircle2 size={17} /> Ticket limits and payment reconciliation need database records plus PayPal/Stripe webhooks.</span>
+          </div>
+        </section>
+      </>
+    )
+  }
 
   return (
     <>
@@ -1017,21 +1131,21 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
         <div className="admin-main">
           <div className="admin-login-preview">
             <div>
-              <div className="section-kicker"><LockKeyhole size={16} /> Production auth required</div>
-              <h2>Admin login is preview-only until a real auth provider is connected.</h2>
-              <p>For deployment, protect admin routes with Vercel/Netlify identity, Supabase Auth, Clerk, or another trusted provider. Do not rely on this frontend-only mock for real access control.</p>
+              <div className="section-kicker"><LockKeyhole size={16} /> Demo dashboard unlocked</div>
+              <h2>Admin preview is for operations planning, not public editing yet.</h2>
+              <p>Use this to review the event workflow, exports, ticket caps, funds, and payment setup. Before real launch, protect editing with server-side authentication and audit logs.</p>
             </div>
-            <form className="login-mini-form" onSubmit={(event) => handleSubmit(event, 'Admin preview login')}>
-              <label>Admin email<input name="name" type="email" placeholder="admin@logaloadmn.org" required /></label>
-              <label>Password<input name="password" type="password" placeholder="Preview only" required /></label>
-              <button className="primary-button full" type="submit">Preview admin dashboard</button>
+            <form className="login-mini-form" onSubmit={(event) => handleSubmit(event, 'Admin note')}>
+              <label>Admin note<input name="name" placeholder="Example: camping wording still needs approval" required /></label>
+              <label>Priority<select name="priority" defaultValue="Event copy"><option>Event copy</option><option>Ticket setup</option><option>Payment setup</option><option>Vendor follow-up</option></select></label>
+              <button className="primary-button full" type="submit">Add admin note</button>
             </form>
           </div>
           <div className="admin-metrics">
             <span><strong>312</strong> QR scans</span>
             <span><strong>$12,640</strong> launch raised</span>
             <span><strong>64%</strong> PayPal checkout</span>
-            <span><strong>17</strong> open admin tasks</span>
+            <span><strong>219</strong> tickets left</span>
           </div>
           <div className="traffic-grid admin-traffic">
             {trafficMetrics.map((metric) => (
@@ -1043,6 +1157,23 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
               const Icon = tool.icon
               return <div className="admin-tool" key={tool.title}><Icon size={20} /><strong>{tool.title}</strong><p>{tool.copy}</p></div>
             })}
+          </div>
+          <div className="admin-inventory-panel">
+            <div>
+              <div className="section-kicker"><Ticket size={16} /> Ticket inventory model</div>
+              <h2>Low-ticket warnings before checkout.</h2>
+              <p>These caps are demo data. Production should update them from confirmed orders and payment webhooks so buyers cannot oversell an event.</p>
+            </div>
+            <div className="admin-inventory-grid">
+              {ticketInventory.map((ticket) => (
+                <span className={ticket.remaining <= 25 ? 'low' : ''} key={ticket.id}>
+                  <strong>{ticket.label}</strong>
+                  <small>{ticket.remaining} left</small>
+                  <i><b style={{ width: `${ticket.percentSold}%` }} /></i>
+                  <em>{ticket.percentSold}% sold</em>
+                </span>
+              ))}
+            </div>
           </div>
           <div className="export-strip" aria-label="Prototype CSV exports">
             <strong>CSV exports</strong>
@@ -1118,6 +1249,32 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
           <div className="hero-actions">
             <button className="secondary-button" type="button" onClick={() => { setSelectedEvent(events[0]); go('/mudfest') }}>Preview Mud Fest</button>
             <button className="secondary-button" type="button" onClick={() => go('/donate')}>Preview donation flow</button>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+function AdminLockedPage({ go }) {
+  return (
+    <>
+      <PageIntro kicker="Admin locked" icon={LockKeyhole} title="Admin dashboard is not public." copy="The public GitHub Pages demo intentionally hides the dashboard. That keeps the URL clean for buyers and protects the site from looking like anyone can access back-office tools." />
+      <section className="admin-lock-layout">
+        <div className="admin-lock-card guidance-card">
+          <div className="section-kicker"><ShieldCheck size={16} /> What this means</div>
+          <h2>Good public demo. Not the final admin host.</h2>
+          <span><CheckCircle2 size={17} /> Public visitors can browse events, buy ticket previews, donate, register, and contact vendors.</span>
+          <span><CheckCircle2 size={17} /> Real admin login should move to Vercel/Netlify protected deployment or a backend app.</span>
+          <span><CheckCircle2 size={17} /> Payment links can launch first; inventory locks require provider limits or database-backed checkout.</span>
+        </div>
+        <div className="admin-lock-card">
+          <div className="section-kicker"><Globe2 size={16} /> Next production step</div>
+          <h2>Connect auth before edit power.</h2>
+          <p>For now, this route is a professional handoff screen instead of an open admin dashboard. The local project still contains the dashboard blueprint for review and backend wiring.</p>
+          <div className="hero-actions">
+            <button className="primary-button large" type="button" onClick={() => go('/events')}>Back to events</button>
+            <button className="secondary-button large" type="button" onClick={() => go('/tickets')}>View tickets</button>
           </div>
         </div>
       </section>

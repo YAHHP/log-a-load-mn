@@ -15,7 +15,7 @@ The product direction is a multi-event charity hub, not a single truck-pull page
 - Vendors: vendors and sponsor interest form
 - FAQ: rules, payment safety, contact form, and launch notes
 - Success: receipt-style return page for hosted checkout
-- Admin: preview dashboard for analytics, event edits, exports, ticket/fund setup, and payment configuration
+- Admin: locked public route with a local/demo-only dashboard blueprint for analytics, event edits, exports, ticket inventory, fund setup, and payment configuration
 
 Legacy local links `#/participants` and `#/pullers` still render the Register page so old review links do not break.
 
@@ -64,9 +64,13 @@ VITE_PAYPAL_DONATE_URL=
 VITE_VENMO_PROFILE_URL=
 VITE_STRIPE_TICKETS_URL=
 VITE_STRIPE_DONATE_URL=
+VITE_ENABLE_ADMIN_DEMO=false
+VITE_ADMIN_DEMO_CODE=
 ```
 
 These are public hosted checkout URLs, not secret API keys. Do not put PayPal client secrets, Stripe secret keys, webhook signing secrets, or admin passwords in the frontend.
+
+The admin demo variables are only for local review or an intentionally protected demo. Frontend gates are not production authentication.
 
 Helpful official docs:
 
@@ -98,6 +102,8 @@ Keep the public website static and CDN-backed for heavy QR/event traffic.
 - Store events, funds, ticket products, registrations, vendors, sponsors, orders, and webhook/payment IDs in a database.
 - Send admin email alerts after form submissions and confirmed payments.
 - Use CSV export for first event check-in, then add barcode/QR scanning later.
+- Use GitHub Pages for a public demo URL only; move to Vercel/Netlify plus auth/backend before giving admins real edit power.
+- Ticket availability warnings are modeled in the frontend, but real sold-out protection requires provider limits or a database-backed checkout flow.
 
 See `LAUNCH_CHECKLIST.md` and `SECURITY_NOTES.md` for the launch handoff.
 
@@ -121,11 +127,15 @@ Verified on June 2, 2026:
 
 - `npm run lint` passes.
 - `npm run build` passes.
+- `GITHUB_PAGES=true npm run build` passes for the deployed GitHub Pages base path.
 - `npm audit --audit-level=moderate` reports `found 0 vulnerabilities` after applying `npm audit fix`.
 - No dangerous frontend sinks or obvious secret strings found in `src`, `public`, `index.html`, `vite.config.js`, or docs.
 - Playwright route QA passed 22 desktop/mobile checks across Home, Events, Mud Fest, Tickets, Donate, Register, Vendors, FAQ, Success, Admin, and legacy `#/pullers`.
 - Playwright confirmed no horizontal overflow on desktop or 390px mobile viewports.
 - V2 route language now treats Log A Load Minnesota as a multi-event hub and makes `Register` the visible event-role signup path.
+- Public Admin nav was removed; direct public admin access now shows a locked production handoff instead of exposing the dashboard.
+- Ticket availability cards were added for buyer urgency and admin inventory planning.
+- Local/dev admin demo gate unlocks with the configured demo code and shows dashboard inventory/export/payment setup surfaces.
 
 Latest screenshot artifacts:
 

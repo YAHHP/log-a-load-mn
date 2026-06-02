@@ -34,6 +34,13 @@ For Stripe, use official Payment Links: https://docs.stripe.com/payments/payment
 
 Recommended v1 is static hosting, not public Mac hosting.
 
+### Current Demo
+
+- Current public demo host: GitHub Pages.
+- This is acceptable for showing the public event website and QR flow.
+- It is not the best final host for authenticated admin tools, payment webhooks, or backend ticket inventory.
+- GitHub Pages custom domain docs: https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site
+
 ### Vercel
 
 - Import the project from GitHub or run Vercel CLI from the project root.
@@ -54,7 +61,7 @@ Recommended v1 is static hosting, not public Mac hosting.
 
 ## Admin V1 Reality Check
 
-The current Admin page is a polished preview, not secure production admin.
+The current public Admin route is locked. The dashboard blueprint is available only for local or intentionally enabled demo review, not public editing.
 
 Before real launch, connect:
 
@@ -63,6 +70,13 @@ Before real launch, connect:
 - Form handlers that send email alerts and save records.
 - Payment webhooks that reconcile hosted checkout payments.
 - CSV exports backed by real data.
+- Ticket capacity checks that update from confirmed orders, not static frontend numbers.
+
+Vercel Deployment Protection can protect deployments before a full auth app exists: https://vercel.com/docs/deployment-protection
+
+For Stripe Payment Links, create hosted checkout links and use backend/webhook records for reconciliation: https://docs.stripe.com/payment-links/create
+
+For PayPal Payment Links and Buttons, create the hosted payment link from the organization account: https://www.paypal.com/us/business/accept-payments/payment-links
 
 ## Final Copy To Confirm
 
