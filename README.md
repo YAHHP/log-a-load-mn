@@ -54,6 +54,56 @@ http://127.0.0.1:5177/#/qr-kit
 http://127.0.0.1:5177/#/admin
 ```
 
+## Backend V1
+
+Backend V1 is a local Express API for real prototype operations:
+
+- Server-side admin login with `ADMIN_PASSWORD`.
+- Events, funds, tickets, payment links, orders, donations, registrations, vendors, contact requests, admin notes, webhooks, email outbox, and audit log.
+- Ticket checkout intent creation with capacity checks.
+- Donation checkout intent creation with fund selection.
+- Payment webhook intake for later PayPal/Stripe reconciliation.
+- CSV exports for orders, tickets, funds, vendors, contacts, outbox, and audit.
+- Local email notification outbox so admin alerts are visible before a real email provider is connected.
+
+Run the API in one terminal:
+
+```bash
+npm run api
+```
+
+Run the frontend in another terminal:
+
+```bash
+npm run dev -- --host 127.0.0.1 --port 5177
+```
+
+Open:
+
+```text
+http://127.0.0.1:5177/#/admin
+```
+
+Default local admin password:
+
+```text
+logaload-admin-preview
+```
+
+Set a real local password before sharing admin access:
+
+```bash
+ADMIN_PASSWORD="replace-with-real-password" ADMIN_SESSION_SECRET="replace-with-long-random-secret" npm run api
+```
+
+Generated local records are stored in:
+
+```text
+server/data/local-db.json
+```
+
+That file is intentionally ignored by git.
+
 ## Payment Setup
 
 Do not collect or hold card data in this app. V1 should redirect to hosted provider checkout links owned by Log A Load Minnesota or the approved fiscal host.
@@ -72,6 +122,7 @@ VITE_PAYPAL_DONATE_URL=
 VITE_VENMO_PROFILE_URL=
 VITE_STRIPE_TICKETS_URL=
 VITE_STRIPE_DONATE_URL=
+VITE_API_BASE_URL=http://127.0.0.1:8787
 VITE_ENABLE_ADMIN_DEMO=false
 VITE_ADMIN_DEMO_CODE=
 ```
@@ -132,6 +183,7 @@ Keep the public website static and CDN-backed for heavy QR/event traffic.
 - Use GitHub Pages for a public demo URL only; move to Vercel/Netlify plus auth/backend before giving admins real edit power.
 - Ticket availability warnings are modeled in the frontend, but real sold-out protection requires provider limits or a database-backed checkout flow.
 - GitHub Pages is fine for early static QR traffic and feedback review. It is not enough for protected admin editing, payment webhooks, real inventory locks, or durable order records.
+- Backend V1 now proves the data-backed path locally. Before public launch, move `server/data/local-db.json` to a managed database such as Supabase/Postgres, SQLite on a hosted VM, or another durable store with backups.
 
 See `LAUNCH_CHECKLIST.md` and `SECURITY_NOTES.md` for the launch handoff.
 
@@ -155,6 +207,7 @@ Verified on June 2, 2026:
 
 - `npm run lint` passes.
 - `npm run build` passes.
+- `npm run test:api` passes for Backend V1 checkout, admin, export, and webhook behavior.
 - `GITHUB_PAGES=true npm run build` passes for the deployed GitHub Pages base path.
 - `npm audit --audit-level=moderate` reports `found 0 vulnerabilities` after applying `npm audit fix`.
 - No dangerous frontend sinks or obvious secret strings found in `src`, `public`, `index.html`, `vite.config.js`, or docs.

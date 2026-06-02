@@ -5,12 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "api": "node server/index.js",
     "build": "vite build",
     "generate:qrs": "node scripts/generate-qrs.mjs",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:api": "node --test server/**/*.test.js"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "lucide-react": "^1.14.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"

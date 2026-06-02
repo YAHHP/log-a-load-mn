@@ -33,6 +33,7 @@ import {
   X,
 } from 'lucide-react'
 import './App.css'
+import { apiExportUrl, apiGet, apiPost, apiPut, getAdminToken, hasApiBase, setAdminToken } from './api'
 
 const routes = [
   { path: '/', label: 'Home' },
@@ -395,8 +396,19 @@ function getPaymentUrl(flow, paymentMethodId) {
   return ''
 }
 
+function getSubmissionEndpoint(type) {
+  if (type === 'Event registration') return '/api/registrations'
+  if (type === 'Vendor application') return '/api/vendor-applications'
+  if (type === 'Contact request') return '/api/contact-requests'
+  return ''
+}
+
 function formatMoney(amount) {
   return `$${amount.toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+}
+
+function formatCents(cents) {
+  return `$${((Number(cents) || 0) / 100).toLocaleString('en-US', { maximumFractionDigits: 0 })}`
 }
 
 function getTicketTotal(ticketQuantities) {
@@ -422,6 +434,21 @@ function exportCsv(filename, rows) {
   URL.revokeObjectURL(url)
 }
 
+async function downloadAdminExport(type, token) {
+  const response = await fetch(apiExportUrl(type), {
+    headers: { authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) throw new Error(`Could not export ${type}.`)
+  const blob = await response.blob()
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = `log-a-load-${type}.csv`
+  anchor.rel = 'noopener'
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
 function App() {
   const [route, setRoute] = useState(getRoute)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -431,6 +458,10 @@ function App() {
   const [selectedTicket, setSelectedTicket] = useState(ticketOptions[0])
   const [selectedPayment, setSelectedPayment] = useState(paymentMethods[0])
   const [ticketQuantities, setTicketQuantities] = useState({ general: 1, kids: 0, pit: 0, camping: 0 })
+  const [backendStatus, setBackendStatus] = useState({
+    state: hasApiBase() ? 'checking' : 'static',
+    message: hasApiBase() ? 'Checking Backend V1...' : 'Static demo mode',
+  })
   const routedEvent = getEventByPath(route)
 
   useEffect(() => {
@@ -441,6 +472,29 @@ function App() {
     }
     window.addEventListener('hashchange', onHashChange)
     return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  useEffect(() => {
+    if (!hasApiBase()) return
+    let active = true
+    apiGet('/api/health')
+      .then((health) => {
+        if (!active) return
+        setBackendStatus({
+          state: 'connected',
+          message: `Backend V1 connected - ${health.authMode}`,
+        })
+      })
+      .catch(() => {
+        if (!active) return
+        setBackendStatus({
+          state: 'offline',
+          message: 'Backend V1 offline; public pages stay in static fallback mode.',
+        })
+      })
+    return () => {
+      active = false
+    }
   }, [])
 
   const metrics = useMemo(
@@ -457,16 +511,26 @@ function App() {
     window.location.hash = path
   }
 
-  function handleSubmit(event, type) {
+  async function handleSubmit(event, type) {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    const payload = Object.fromEntries(formData.entries())
     const name = formData.get('name') || formData.get('business') || 'New submission'
-    setSubmission({
-      type,
-      name,
-      time: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
-    })
-    event.currentTarget.reset()
+    const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+
+    try {
+      const endpoint = getSubmissionEndpoint(type)
+      if (endpoint && hasApiBase()) {
+        await apiPost(endpoint, payload)
+        setSubmission({ type, name, time, detail: `${type} saved to Backend V1 and queued for admin email review.` })
+      } else {
+        setSubmission({ type, name, time })
+      }
+      form.reset()
+    } catch (error) {
+      setSubmission({ type: `${type} issue`, name, time, detail: error.message })
+    }
   }
 
   function updateTicketQuantity(ticketId, value) {
@@ -474,15 +538,67 @@ function App() {
     setTicketQuantities((current) => ({ ...current, [ticketId]: quantity }))
   }
 
-  function handleHostedPayment(event, flow, paymentMethod, extraParams = {}) {
+  async function handleHostedPayment(event, flow, paymentMethod, extraParams = {}) {
     event.preventDefault()
-    const formData = new FormData(event.currentTarget)
+    const form = event.currentTarget
+    const formData = new FormData(form)
     const name = formData.get('name') || formData.get('business') || 'New visitor'
     setSubmission({
       type: flow === 'donation' ? 'Donation checkout' : 'Ticket checkout',
       name,
       time: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
     })
+
+    try {
+      if (hasApiBase()) {
+        const response = flow === 'donation'
+          ? await apiPost('/api/checkout/donations', {
+            fundId: selectedFund.id,
+            amount: formData.get('amount'),
+            note: formData.get('note'),
+            paymentMethod: paymentMethod.id,
+            donor: {
+              name: formData.get('name'),
+              email: formData.get('email'),
+              phone: formData.get('phone'),
+            },
+          })
+          : await apiPost('/api/checkout/tickets', {
+            eventId: 'mud-fest',
+            paymentMethod: paymentMethod.id,
+            buyer: {
+              name: formData.get('name'),
+              email: formData.get('email'),
+              phone: formData.get('phone'),
+            },
+            items: Object.entries(ticketQuantities)
+              .filter(([, quantity]) => Number(quantity) > 0)
+              .map(([ticketId, quantity]) => ({ ticketId, quantity })),
+          })
+
+        setSubmission({
+          type: flow === 'donation' ? 'Donation checkout' : 'Ticket checkout',
+          name,
+          time: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+          detail: `Backend V1 record ${response.record.id} created.`,
+        })
+
+        if (response.checkoutUrl) {
+          window.location.assign(response.checkoutUrl)
+          return
+        }
+        go(response.successPath)
+        return
+      }
+    } catch (error) {
+      setSubmission({
+        type: 'Backend checkout issue',
+        name,
+        time: new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+        detail: `${error.message} Falling back to local preview.`,
+      })
+    }
+
     const hostedUrl = getPaymentUrl(flow, paymentMethod.id)
     if (hostedUrl) {
       window.location.assign(hostedUrl)
@@ -514,7 +630,7 @@ function App() {
         {route === '/vendors' && <VendorsPage handleSubmit={handleSubmit} />}
         {route === '/faq' && <FaqPage handleSubmit={handleSubmit} />}
         {route === '/success' && <SuccessPage go={go} />}
-        {route === '/admin' && <AdminPage setSelectedEvent={setSelectedEvent} go={go} handleSubmit={handleSubmit} />}
+        {route === '/admin' && <AdminPage setSelectedEvent={setSelectedEvent} go={go} handleSubmit={handleSubmit} backendStatus={backendStatus} />}
       </main>
       <Footer />
     </div>
@@ -1556,19 +1672,110 @@ function SuccessPage({ go }) {
   )
 }
 
-function AdminPage({ setSelectedEvent, go, handleSubmit }) {
+function AdminPage({ setSelectedEvent, go, handleSubmit, backendStatus }) {
   const [adminUnlocked, setAdminUnlocked] = useState(false)
   const [adminCode, setAdminCode] = useState('')
   const [adminError, setAdminError] = useState('')
+  const [adminSuccess, setAdminSuccess] = useState('')
+  const [adminMode, setAdminMode] = useState('demo')
+  const [adminTokenState, setAdminTokenState] = useState(getAdminToken)
+  const [dashboard, setDashboard] = useState(null)
 
-  function handleAdminUnlock(event) {
+  async function loadDashboard(token = adminTokenState) {
+    const data = await apiGet('/api/admin/dashboard', token)
+    setDashboard(data)
+    return data
+  }
+
+  async function handleAdminUnlock(event) {
     event.preventDefault()
+    setAdminError('')
+    setAdminSuccess('')
+
+    if (hasApiBase()) {
+      try {
+        const login = await apiPost('/api/admin/login', { password: adminCode })
+        setAdminToken(login.token)
+        setAdminTokenState(login.token)
+        const data = await loadDashboard(login.token)
+        setDashboard(data)
+        setAdminMode('backend')
+        setAdminUnlocked(true)
+        setAdminSuccess('Backend V1 admin login connected.')
+        return
+      } catch (error) {
+        if (!adminPreviewEnabled) {
+          setAdminError(error.message)
+          return
+        }
+      }
+    }
+
     if (adminCode.trim() === adminDemoCode) {
       setAdminUnlocked(true)
+      setAdminMode('demo')
       setAdminError('')
       return
     }
-    setAdminError('That demo code did not match. For public launch, this needs real server-side authentication.')
+    setAdminError('That admin password/demo code did not match. Backend V1 uses ADMIN_PASSWORD; local demo uses VITE_ADMIN_DEMO_CODE.')
+  }
+
+  async function handleAdminNote(event) {
+    event.preventDefault()
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    if (adminMode === 'backend') {
+      try {
+        await apiPost('/api/admin/notes', {
+          text: formData.get('name'),
+          priority: formData.get('priority'),
+        }, adminTokenState)
+        await loadDashboard()
+        setAdminSuccess('Admin note saved to Backend V1.')
+        form.reset()
+        return
+      } catch (error) {
+        setAdminError(error.message)
+      }
+    }
+    handleSubmit(event, 'Admin note')
+  }
+
+  async function handleEventSave(event) {
+    event.preventDefault()
+    if (adminMode !== 'backend') {
+      setAdminError('Use Backend V1 login before saving event edits.')
+      return
+    }
+    const formData = new FormData(event.currentTarget)
+    try {
+      await apiPut(`/api/admin/events/${formData.get('eventId')}`, {
+        date: formData.get('date'),
+        status: formData.get('status'),
+        summary: formData.get('summary'),
+        eventDayNote: formData.get('rules'),
+      }, adminTokenState)
+      await loadDashboard()
+      setAdminSuccess('Event draft saved to Backend V1.')
+    } catch (error) {
+      setAdminError(error.message)
+    }
+  }
+
+  async function handlePaymentLinksSave(event) {
+    event.preventDefault()
+    if (adminMode !== 'backend') {
+      setAdminError('Use Backend V1 login before saving payment links.')
+      return
+    }
+    const formData = new FormData(event.currentTarget)
+    try {
+      await apiPut('/api/admin/payment-links', Object.fromEntries(formData.entries()), adminTokenState)
+      await loadDashboard()
+      setAdminSuccess('Hosted payment links saved to Backend V1.')
+    } catch (error) {
+      setAdminError(error.message)
+    }
   }
 
   const adminTools = [
@@ -1579,8 +1786,33 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
     { icon: Download, title: 'Exports', copy: 'Download CSV lists for gate check-in, vendor setup, donor follow-up, and sponsors.' },
     { icon: ShieldCheck, title: 'Payment control', copy: 'Reconcile Stripe/PayPal sessions with donor records and event funds.' },
   ]
+  const liveTicketInventory = dashboard?.ticketTypes || ticketInventory
+  const liveEvents = dashboard?.events || events
+  const liveFunds = dashboard?.funds || funds
+  const livePaymentLinks = dashboard?.paymentLinks || paymentLinks
+  const adminMetrics = dashboard
+    ? [
+      { value: dashboard.counts.orders, label: 'orders', detail: 'Ticket checkout intents' },
+      { value: formatCents(dashboard.money.projectedCents), label: 'paid tracked', detail: 'Webhook-reconciled total' },
+      { value: dashboard.counts.registrations, label: 'registrations', detail: 'Event signup records' },
+      { value: liveTicketInventory.reduce((sum, ticket) => sum + ticket.remaining, 0), label: 'tickets left', detail: 'Backend capacity model' },
+    ]
+    : [
+      { value: '312', label: 'QR scans', detail: 'Preview analytics placeholder' },
+      { value: '$12,640', label: 'launch raised', detail: 'Static prototype metric' },
+      { value: '64%', label: 'PayPal checkout', detail: 'Preview payment mix' },
+      { value: '219', label: 'tickets left', detail: 'Static inventory model' },
+    ]
+  const recentAdminRows = dashboard
+    ? [
+      ...dashboard.recent.orders.map((row) => ({ id: row.id, type: 'Order', name: row.buyer?.name || 'Ticket buyer', event: row.eventId, detail: `${row.items.length} ticket line(s)`, status: row.status, amount: formatCents(row.totalCents), method: row.paymentMethod })),
+      ...dashboard.recent.donations.map((row) => ({ id: row.id, type: 'Donation', name: row.donor?.name || 'Donor', event: row.fundLabel, detail: row.note || 'Donation intent', status: row.status, amount: formatCents(row.amountCents), method: row.paymentMethod })),
+      ...dashboard.recent.registrations.map((row) => ({ id: row.id, type: 'Registration', name: row.name, event: row.event, detail: row.signupType, status: row.status, amount: '$0', method: 'Form' })),
+      ...dashboard.recent.vendorApplications.map((row) => ({ id: row.id, type: 'Vendor', name: row.business, event: row.eventInterest, detail: row.booth, status: row.status, amount: '$0', method: 'Form' })),
+    ].slice(0, 10)
+    : adminRows
 
-  if (!adminPreviewEnabled) {
+  if (!adminPreviewEnabled && !hasApiBase()) {
     return <AdminLockedPage go={go} />
   }
 
@@ -1591,19 +1823,21 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
         <PageSignalBand items={pageSignals.admin} />
         <section className="admin-lock-layout">
           <form className="form-card admin-lock-card" onSubmit={handleAdminUnlock}>
-            <div className="section-kicker"><ShieldCheck size={16} /> Local demo gate</div>
-            <h2>Enter the admin demo code.</h2>
-            <p>This is only for local or intentionally enabled demo deployments. It is not a replacement for real auth.</p>
-            <label>Demo code<input name="adminCode" type="password" value={adminCode} onChange={(event) => setAdminCode(event.target.value)} placeholder="Ask site owner for code" required /></label>
+            <div className="section-kicker"><ShieldCheck size={16} /> Backend V1 access</div>
+            <h2>Enter the admin password.</h2>
+            <p>{hasApiBase() ? 'Backend V1 will verify this server-side and load live records.' : 'Local demo deployments can still use the preview code. Real launch needs Backend V1 or hosted auth.'}</p>
+            <label>Admin password<input name="adminCode" type="password" value={adminCode} onChange={(event) => setAdminCode(event.target.value)} placeholder="ADMIN_PASSWORD or demo code" required /></label>
             {adminError && <span className="form-error">{adminError}</span>}
-            <button className="primary-button full" type="submit">Open admin preview</button>
+            {adminSuccess && <span className="form-success">{adminSuccess}</span>}
+            <button className="primary-button full" type="submit">{hasApiBase() ? 'Open Backend V1 admin' : 'Open admin preview'}</button>
           </form>
           <div className="admin-lock-card guidance-card">
             <div className="section-kicker"><Globe2 size={16} /> Professional launch path</div>
             <h2>Use protected hosting or real auth for production.</h2>
             <span><CheckCircle2 size={17} /> GitHub Pages is fine for a public brochure/demo.</span>
-            <span><CheckCircle2 size={17} /> Admin editing needs Vercel/Netlify protection, Supabase Auth, Clerk, or another server-backed provider.</span>
-            <span><CheckCircle2 size={17} /> Ticket limits and payment reconciliation need database records plus PayPal/Stripe webhooks.</span>
+            <span><CheckCircle2 size={17} /> Backend V1 now supports server-side admin login, edits, exports, form records, and local email outbox.</span>
+            <span><CheckCircle2 size={17} /> Final launch should move JSON storage to a managed database and verify PayPal/Stripe webhooks.</span>
+            <span><Gauge size={17} /> {backendStatus.message}</span>
           </div>
         </section>
       </>
@@ -1626,21 +1860,22 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
         <div className="admin-main">
           <div className="admin-login-preview">
             <div>
-              <div className="section-kicker"><LockKeyhole size={16} /> Demo dashboard unlocked</div>
-              <h2>Admin preview is for operations planning, not public editing yet.</h2>
-              <p>Use this to review the event workflow, exports, ticket caps, funds, and payment setup. Before real launch, protect editing with server-side authentication and audit logs.</p>
+              <div className="section-kicker"><LockKeyhole size={16} /> {adminMode === 'backend' ? 'Backend dashboard unlocked' : 'Demo dashboard unlocked'}</div>
+              <h2>{adminMode === 'backend' ? 'Backend V1 is tracking real local records.' : 'Admin preview is for operations planning, not public editing yet.'}</h2>
+              <p>{adminMode === 'backend' ? 'Forms, checkout intents, event edits, payment links, exports, and local email notifications now write to the server datastore.' : 'Use this to review the event workflow, exports, ticket caps, funds, and payment setup. Before real launch, protect editing with server-side authentication and audit logs.'}</p>
+              {adminError && <span className="form-error">{adminError}</span>}
+              {adminSuccess && <span className="form-success">{adminSuccess}</span>}
             </div>
-            <form className="login-mini-form" onSubmit={(event) => handleSubmit(event, 'Admin note')}>
+            <form className="login-mini-form" onSubmit={handleAdminNote}>
               <label>Admin note<input name="name" placeholder="Example: camping wording still needs approval" required /></label>
               <label>Priority<select name="priority" defaultValue="Event copy"><option>Event copy</option><option>Ticket setup</option><option>Payment setup</option><option>Vendor follow-up</option></select></label>
               <button className="primary-button full" type="submit">Add admin note</button>
             </form>
           </div>
           <div className="admin-metrics">
-            <span><strong>312</strong> QR scans</span>
-            <span><strong>$12,640</strong> launch raised</span>
-            <span><strong>64%</strong> PayPal checkout</span>
-            <span><strong>219</strong> tickets left</span>
+            {adminMetrics.map((metric) => (
+              <span key={metric.label}><strong>{metric.value}</strong>{metric.label}<small>{metric.detail}</small></span>
+            ))}
           </div>
           <div className="traffic-grid admin-traffic">
             {trafficMetrics.map((metric) => (
@@ -1660,7 +1895,7 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
               <p>These caps are demo data. Production should update them from confirmed orders and payment webhooks so buyers cannot oversell an event.</p>
             </div>
             <div className="admin-inventory-grid">
-              {ticketInventory.map((ticket) => (
+              {liveTicketInventory.map((ticket) => (
                 <span className={ticket.remaining <= 25 ? 'low' : ''} key={ticket.id}>
                   <strong>{ticket.label}</strong>
                   <small>{ticket.remaining} left</small>
@@ -1672,36 +1907,37 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
           </div>
           <div className="export-strip" aria-label="Prototype CSV exports">
             <strong>CSV exports</strong>
-            <button type="button" onClick={() => exportCsv('log-a-load-orders.csv', adminExportData.orders)}><Download size={17} /> Orders</button>
-            <button type="button" onClick={() => exportCsv('log-a-load-tickets.csv', adminExportData.tickets)}><Download size={17} /> Tickets</button>
-            <button type="button" onClick={() => exportCsv('log-a-load-funds.csv', adminExportData.funds)}><Download size={17} /> Funds</button>
-            <button type="button" onClick={() => exportCsv('log-a-load-vendors.csv', adminExportData.vendors)}><Download size={17} /> Vendors</button>
+            <button type="button" onClick={() => adminMode === 'backend' ? downloadAdminExport('orders', adminTokenState) : exportCsv('log-a-load-orders.csv', adminExportData.orders)}><Download size={17} /> Orders</button>
+            <button type="button" onClick={() => adminMode === 'backend' ? downloadAdminExport('tickets', adminTokenState) : exportCsv('log-a-load-tickets.csv', adminExportData.tickets)}><Download size={17} /> Tickets</button>
+            <button type="button" onClick={() => adminMode === 'backend' ? downloadAdminExport('funds', adminTokenState) : exportCsv('log-a-load-funds.csv', adminExportData.funds)}><Download size={17} /> Funds</button>
+            <button type="button" onClick={() => adminMode === 'backend' ? downloadAdminExport('vendors', adminTokenState) : exportCsv('log-a-load-vendors.csv', adminExportData.vendors)}><Download size={17} /> Vendors</button>
+            <button type="button" onClick={() => adminMode === 'backend' ? downloadAdminExport('outbox', adminTokenState) : exportCsv('log-a-load-outbox.csv', [])}><Download size={17} /> Email outbox</button>
           </div>
           <div className="admin-editor-grid">
-            <div className="form-card admin-editor">
+            <form className="form-card admin-editor" onSubmit={handleEventSave}>
               <h2>Edit event</h2>
-              <label>Event<select defaultValue="Mud Fest Hillman">{events.map((event) => <option key={event.id}>{event.label}</option>)}</select></label>
+              <label>Event<select name="eventId" defaultValue="mud-fest">{liveEvents.map((event) => <option value={event.id} key={event.id}>{event.label}</option>)}</select></label>
               <div className="two-col">
-                <label>Date<input defaultValue="Memorial & Labor Day 2026" /></label>
-                <label>Status<select defaultValue="Registration open"><option>Draft</option><option>Registration open</option><option>Sold out</option><option>Closed</option></select></label>
+                <label>Date<input name="date" defaultValue="Memorial & Labor Day 2026" /></label>
+                <label>Status<select name="status" defaultValue="Registration open"><option>Draft</option><option>Registration open</option><option>Sold out</option><option>Closed</option></select></label>
               </div>
-              <label>Public summary<textarea defaultValue="Food, trucks, beer garden, camping, pit passes, kids pricing, and charity fund selection through Log A Load." /></label>
-              <label>Rules copy<textarea defaultValue={mudFestRules.join('\n')} /></label>
-              <label>Fund options<textarea defaultValue={funds.map((fund) => fund.label).join('\n')} /></label>
-              <button className="primary-button full" type="button">Save event draft</button>
-            </div>
+              <label>Public summary<textarea name="summary" defaultValue="Food, trucks, beer garden, camping, pit passes, kids pricing, and charity fund selection through Log A Load." /></label>
+              <label>Rules copy<textarea name="rules" defaultValue={mudFestRules.join('\n')} /></label>
+              <label>Fund options<textarea value={liveFunds.map((fund) => fund.label).join('\n')} readOnly /></label>
+              <button className="primary-button full" type="submit">Save event draft</button>
+            </form>
             <div className="class-table admin-classes">
               <h2>Ticket + fund manager</h2>
-              {ticketOptions.map((item) => (
+              {liveTicketInventory.map((item) => (
                 <div className="class-row" key={item.id}>
                   <strong>{item.label}</strong>
-                  <span>{item.price}</span>
+                  <span>{item.price || formatCents(item.priceCents)}</span>
                   <span>{item.id === 'camping' ? 'Confirm details' : 'Published'}</span>
                   <button type="button">Edit</button>
                 </div>
               ))}
               <h3>Donation funds</h3>
-              {funds.map((fund) => (
+              {liveFunds.map((fund) => (
                 <div className="class-row" key={fund.id}>
                   <strong>{fund.label}</strong>
                   <span>{fund.id === 'mud-fest' ? 'Event default' : 'Optional'}</span>
@@ -1722,17 +1958,19 @@ function AdminPage({ setSelectedEvent, go, handleSubmit }) {
               ))}
             </div>
           </div>
-          <div className="payment-config-grid">
+          <form className="payment-config-grid payment-config-form" onSubmit={handlePaymentLinksSave}>
             {Object.entries(paymentEnvKeys).map(([key, envName]) => (
-              <div className={paymentLinks[key] ? 'payment-config connected' : 'payment-config'} key={key}>
-                <strong>{envName}</strong>
-                <span>{paymentLinks[key] ? 'Connected' : 'Needs hosted link'}</span>
-                <small>{paymentLinks[key] || 'Set this in Vercel/Netlify environment variables after the org creates the hosted link.'}</small>
-              </div>
+              <label className={livePaymentLinks[key] ? 'payment-config connected' : 'payment-config'} key={key}>
+                <strong>{adminMode === 'backend' ? key : envName}</strong>
+                <span>{livePaymentLinks[key] ? 'Connected' : 'Needs hosted link'}</span>
+                <input name={key} defaultValue={livePaymentLinks[key] || ''} placeholder="https://www.paypal.com/..." />
+                <small>{adminMode === 'backend' ? 'Saved server-side for Backend V1 checkout handoff.' : 'Set this in Vercel/Netlify environment variables after the org creates the hosted link.'}</small>
+              </label>
             ))}
-          </div>
+            <button className="primary-button full" type="submit">Save hosted payment links</button>
+          </form>
           <div className="lead-table admin-leads">
-            {adminRows.map((row) => (
+            {recentAdminRows.map((row) => (
               <div className="lead-row" key={row.id}>
                 <span className="lead-type">{row.type}</span>
                 <strong>{row.name}</strong>
@@ -1812,7 +2050,7 @@ function Toast({ submission }) {
   return (
     <div className="toast" role="status">
       <CheckCircle2 size={18} />
-      <span>{submission.type} captured for {submission.name} at {submission.time}. Admin email/payment hook will connect in production.</span>
+      <span>{submission.detail || `${submission.type} captured for ${submission.name} at ${submission.time}. Admin email/payment hook will connect in production.`}</span>
     </div>
   )
 }

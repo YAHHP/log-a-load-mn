@@ -65,12 +65,14 @@ The current public Admin route is locked. The dashboard blueprint is available o
 
 Before real launch, connect:
 
-- Real admin authentication.
+- Real hosted admin authentication or harden Backend V1 behind trusted hosting.
 - Database tables for events, funds, tickets, orders, registrations, vendors, sponsors, and admin users.
-- Form handlers that send email alerts and save records.
-- Payment webhooks that reconcile hosted checkout payments.
-- CSV exports backed by real data.
-- Ticket capacity checks that update from confirmed orders, not static frontend numbers.
+- Form handlers that send real email alerts and save records.
+- Payment webhooks that verify PayPal/Stripe signatures and reconcile hosted checkout payments.
+- CSV exports backed by real database records.
+- Ticket capacity checks that update from confirmed orders and provider inventory limits, not static frontend numbers.
+
+Backend V1 now proves these flows locally through Express and `server/data/local-db.json`, but launch should move the datastore and auth to a durable hosted environment.
 
 Vercel Deployment Protection can protect deployments before a full auth app exists: https://vercel.com/docs/deployment-protection
 
@@ -93,6 +95,7 @@ For PayPal Payment Links and Buttons, create the hosted payment link from the or
 
 - `npm run lint`
 - `npm run build`
+- `npm run test:api`
 - Mobile route QA on Home, Events, Mud Fest, Tickets, Donate, Register, Vendors, FAQ, Success, Admin.
 - No horizontal overflow on iPhone viewport.
 - Payment buttons route to approved PayPal/Stripe/Venmo hosted links.

@@ -16,6 +16,21 @@ The frontend prototype now includes the operational surfaces that should exist b
 
 These are static/demo surfaces today. They become production features once connected to real records, auth, payment links, and admin workflows.
 
+## Backend V1 Local Layer
+
+The project now includes a local Backend V1 in `server/`:
+
+- Express API on `http://127.0.0.1:8787`.
+- Server-side admin login through `ADMIN_PASSWORD`.
+- JSON datastore at `server/data/local-db.json`.
+- Public checkout/form records for tickets, donations, registrations, vendors, and contact requests.
+- Ticket capacity checks before checkout intent creation.
+- Payment-link configuration for hosted PayPal, Stripe, and Venmo handoff.
+- Webhook intake that can mark local orders/donations as paid when provider metadata includes the local record id.
+- Admin dashboard API, event edits, admin notes, CSV exports, email outbox, and audit log.
+
+This is enough for local customer review and workflow validation. It is not the final production data architecture.
+
 ## Product Direction
 
 Log A Load MN is the charity ticketing and donation layer for Minnesota events. It should not replace host event websites. It should make QR-code visitors able to buy, donate, register, sponsor, and get a receipt without confusion.
@@ -29,6 +44,7 @@ Log A Load MN is the charity ticketing and donation layer for Minnesota events. 
    - Route success and cancel URLs back to this website.
 
 2. Backend records
+   - Move the local JSON datastore to a managed database with backups.
    - Store events, ticket types, capacities, orders, donations, funds, registrations, vendors, sponsors, and admin notes.
    - Add payment-provider webhook reconciliation so paid orders and donation records are not just form previews.
    - Prevent oversold ticket classes with real remaining inventory.

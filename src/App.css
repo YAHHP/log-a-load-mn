@@ -2588,6 +2588,16 @@ textarea {
   font-weight: 800;
 }
 
+.form-success {
+  display: block;
+  padding: 10px 12px;
+  border: 1px solid rgba(45, 106, 79, 0.22);
+  border-radius: 8px;
+  color: #1f4c35;
+  background: #edf8ef;
+  font-weight: 800;
+}
+
 .login-mini-form {
   margin: 0;
   padding: 16px;
@@ -2859,6 +2869,10 @@ textarea {
   gap: 10px;
 }
 
+.payment-config-form {
+  margin-top: 0;
+}
+
 .payment-config {
   display: grid;
   gap: 6px;
@@ -2893,6 +2907,10 @@ textarea {
   color: #626960;
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+
+.payment-config-form > button {
+  grid-column: 1 / -1;
 }
 
 .traffic-section {
