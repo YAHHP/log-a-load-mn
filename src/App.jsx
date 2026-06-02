@@ -137,6 +137,10 @@ const paymentLinks = {
   stripeDonate: safeHostedPaymentUrl(import.meta.env.VITE_STRIPE_DONATE_URL),
 }
 
+function assetPath(filename) {
+  return `${import.meta.env.BASE_URL}${filename}`
+}
+
 const experienceHighlights = [
   { label: 'Food + beer garden', detail: 'Public-facing event details without sending buyers hunting across sites.' },
   { label: 'Camping passes', detail: 'A separate ticket lane with clear rules once the inclusion policy is confirmed.' },
@@ -373,7 +377,7 @@ function Header({ route, mobileOpen, setMobileOpen }) {
   return (
     <header className="site-header">
       <a className="brand logo-brand" href="#/" aria-label="Log A Load Minnesota home">
-        <img src="/log-a-load-cobrand-logo.avif" alt="Log A Load for Kids and Children's Miracle Network Hospitals logo" />
+        <img src={assetPath('log-a-load-cobrand-logo.avif')} alt="Log A Load for Kids and Children's Miracle Network Hospitals logo" />
         <span>
           <strong>Log A Load MN</strong>
           <small>Local Event Hub</small>
@@ -416,7 +420,7 @@ function HomePage({ metrics, go }) {
         <div className="hero-content">
           <div className="eyebrow"><HandHeart size={16} /> Log A Load Minnesota event hub</div>
           <div className="event-logo-lockup">
-            <img src="/mudfest-logo.png" alt="Mud Fest Hillman logo" />
+            <img src={assetPath('mudfest-logo.png')} alt="Mud Fest Hillman logo" />
             <span>Launch event: Mud Fest Hillman</span>
           </div>
           <h1>Minnesota events that fund the cause.</h1>
@@ -430,7 +434,7 @@ function HomePage({ metrics, go }) {
           </div>
         </div>
         <aside className="hero-panel" aria-label="Event quick actions">
-          <img className="hero-panel-photo" src="/mudfest-2024-event.jpg" alt="Mud Fest trucks and off-road event preview" />
+          <img className="hero-panel-photo" src={assetPath('mudfest-2024-event.jpg')} alt="Mud Fest trucks and off-road event preview" />
           <div className="panel-topline">QR landing target</div>
           <h2>Scan, buy a ticket, pick a fund, and show the confirmation at check-in.</h2>
           <div className="qr-box"><QrCode size={84} /><span>logaloadmn.org/mudfest</span></div>
@@ -498,8 +502,8 @@ function MudFestExperience({ go }) {
       </div>
       <div className="showcase-board" aria-label="Mud Fest highlights">
         <div className="mud-track" />
-        <img className="showcase-photo main-photo" src="/mudfest-2024.jpg" alt="Mud Fest off-road event crowd and vehicles" />
-        <img className="showcase-photo side-photo" src="/mudfest-2024-event.jpg" alt="Mud Fest event action preview" />
+        <img className="showcase-photo main-photo" src={assetPath('mudfest-2024.jpg')} alt="Mud Fest off-road event crowd and vehicles" />
+        <img className="showcase-photo side-photo" src={assetPath('mudfest-2024-event.jpg')} alt="Mud Fest event action preview" />
         {experienceHighlights.map((item) => (
           <div className="showcase-tile" key={item.label}>
             <strong>{item.label}</strong>
@@ -522,7 +526,7 @@ function MudFestPage({ go }) {
       />
       <section className="event-brief">
         <div className="brief-media">
-          <img src="/mudfest-2024.jpg" alt="Mud Fest vehicle moving through mud in front of event crowd" />
+          <img src={assetPath('mudfest-2024.jpg')} alt="Mud Fest vehicle moving through mud in front of event crowd" />
           <div className="brief-badges">
             <span><CalendarDays size={16} /> Memorial & Labor Day 2026</span>
             <span><MapPin size={16} /> Hillman, Minnesota</span>
