@@ -53,8 +53,8 @@ const events = [
     status: 'Registration open',
     goal: '$40,000',
     raised: '$12,640',
-    image: 'mudfest-2024.jpg',
-    visualAlt: 'Mud Fest vehicle moving through mud in front of a crowd',
+    image: 'mud-bogging-commons.jpg',
+    visualAlt: 'Off-road vehicle driving through a mud bog',
     icon: Mountain,
     audience: 'Families, truck fans, campers',
     impact: 'Tickets + donations feed the launch charity lane.',
@@ -70,8 +70,8 @@ const events = [
     status: 'Planning',
     goal: '$50,000',
     raised: '$18,420',
-    image: 'mudfest-2024-event.jpg',
-    visualAlt: 'Off-road event vehicle preview for truck pull planning',
+    image: 'truck-pull-commons.jpg',
+    visualAlt: 'Truck and tractor pull sled on a pulling track',
     icon: Tractor,
     audience: 'Drivers, crews, sponsors',
     impact: 'A future event template for classes, tickets, vendors, and check-in.',
@@ -87,7 +87,8 @@ const events = [
     status: 'Draft',
     goal: '$25,000',
     raised: '$9,800',
-    visual: 'golf',
+    image: 'golf-fairway-commons.jpg',
+    visualAlt: 'Golf course fairway ready for a charity golf outing',
     icon: Trophy,
     audience: 'Teams, hole sponsors, donors',
     impact: 'A clean hub for teams, sponsor tiers, banquet tickets, and raffle funds.',
@@ -413,7 +414,7 @@ function Header({ route, mobileOpen, setMobileOpen }) {
   return (
     <header className="site-header">
       <a className="brand logo-brand" href="#/" aria-label="Log A Load Minnesota home">
-        <img src={assetPath('log-a-load-cobrand-logo.avif')} alt="Log A Load for Kids and Children's Miracle Network Hospitals logo" />
+        <img src={assetPath('log-a-load-cobrand-logo.avif')} alt="Log A Load for Kids and Children's Miracle Network Hospitals logo" decoding="async" />
         <span>
           <strong>Log A Load MN</strong>
           <small>Local Event Hub</small>
@@ -455,7 +456,7 @@ function HomePage({ metrics, go }) {
         <div className="hero-content">
           <div className="eyebrow"><HandHeart size={16} /> Log A Load Minnesota event hub</div>
           <div className="event-logo-lockup">
-            <img src={assetPath('mudfest-logo.png')} alt="Mud Fest Hillman logo" />
+            <img src={assetPath('mudfest-logo.png')} alt="Mud Fest Hillman logo" decoding="async" />
             <span>Launch event: Mud Fest Hillman</span>
           </div>
           <h1>Minnesota events that fund the cause.</h1>
@@ -469,7 +470,7 @@ function HomePage({ metrics, go }) {
           </div>
         </div>
         <aside className="hero-panel" aria-label="Event quick actions">
-          <img className="hero-panel-photo" src={assetPath('mudfest-2024-event.jpg')} alt="Mud Fest trucks and off-road event preview" />
+          <img className="hero-panel-photo" src={assetPath('mudfest-2024-event.jpg')} alt="Mud Fest trucks and off-road event preview" decoding="async" />
           <div className="panel-topline">QR landing target</div>
           <h2>Scan, buy a ticket, pick a fund, and show the confirmation at check-in.</h2>
           <div className="qr-box"><QrCode size={84} /><span>logaloadmn.org/mudfest</span></div>
@@ -539,8 +540,8 @@ function MudFestExperience({ go }) {
       </div>
       <div className="showcase-board" aria-label="Mud Fest highlights">
         <div className="mud-track" />
-        <img className="showcase-photo main-photo" src={assetPath('mudfest-2024.jpg')} alt="Mud Fest off-road event crowd and vehicles" />
-        <img className="showcase-photo side-photo" src={assetPath('mudfest-2024-event.jpg')} alt="Mud Fest event action preview" />
+        <img className="showcase-photo main-photo" src={assetPath('mudfest-2024.jpg')} alt="Mud Fest off-road event crowd and vehicles" loading="lazy" decoding="async" />
+        <img className="showcase-photo side-photo" src={assetPath('mudfest-2024-event.jpg')} alt="Mud Fest event action preview" loading="lazy" decoding="async" />
         {experienceHighlights.map((item) => (
           <div className="showcase-tile" key={item.label}>
             <strong>{item.label}</strong>
@@ -563,7 +564,7 @@ function MudFestPage({ go }) {
       />
       <section className="event-brief">
         <div className="brief-media">
-          <img src={assetPath('mudfest-2024.jpg')} alt="Mud Fest vehicle moving through mud in front of event crowd" />
+          <img src={assetPath('mudfest-2024.jpg')} alt="Mud Fest vehicle moving through mud in front of event crowd" loading="lazy" decoding="async" />
           <div className="brief-badges">
             <span><CalendarDays size={16} /> Memorial & Labor Day 2026</span>
             <span><MapPin size={16} /> Hillman, Minnesota</span>
@@ -811,7 +812,7 @@ function EventVisual({ event, compact = false }) {
   if (event.image) {
     return (
       <div className={compact ? 'event-visual compact' : 'event-visual'}>
-        <img src={assetPath(event.image)} alt={event.visualAlt || event.label} loading="lazy" />
+        <img src={assetPath(event.image)} alt={event.visualAlt || event.label} loading="lazy" decoding="async" />
         <span><Icon size={16} /> {event.label}</span>
       </div>
     )
@@ -1382,7 +1383,10 @@ function Footer() {
         <strong>Log A Load Minnesota</strong>
         <span>Prototype for local review. Final copy, photos, videos, logo permission, payment accounts, and nonprofit details still need customer approval.</span>
       </div>
-      <a href="#/">Home</a>
+      <nav className="footer-links" aria-label="Footer links">
+        <a href="#/">Home</a>
+        <a href="https://github.com/YAHHP/log-a-load-mn/blob/main/ATTRIBUTIONS.md">Image credits</a>
+      </nav>
     </footer>
   )
 }
