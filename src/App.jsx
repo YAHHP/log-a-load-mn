@@ -419,6 +419,14 @@ function getTicketRemaining(ticketId) {
   return ticketInventory.find((ticket) => ticket.id === ticketId)?.remaining ?? 999
 }
 
+function getTicketProductClass(ticket, selectedTicket, ticketQuantities) {
+  return [
+    'ticket-product',
+    selectedTicket.id === ticket.id ? 'active' : '',
+    (ticketQuantities[ticket.id] || 0) > 0 ? 'selected' : '',
+  ].filter(Boolean).join(' ')
+}
+
 function exportCsv(filename, rows) {
   if (!rows.length) return
   const columns = Object.keys(rows[0])
@@ -1433,8 +1441,8 @@ function TicketsPage({ selectedTicket, setSelectedTicket, selectedPayment, setSe
         <div className="ticket-stack">
           <div className="ticket-product-grid">
             {ticketInventory.map((ticket) => (
-              <div className={(ticketQuantities[ticket.id] || 0) > 0 ? 'ticket-product selected' : 'ticket-product'} key={ticket.id}>
-                <button type="button" onClick={() => setSelectedTicket(ticket)}>
+              <div className={getTicketProductClass(ticket, selectedTicket, ticketQuantities)} key={ticket.id} onClick={() => setSelectedTicket(ticket)} onFocusCapture={() => setSelectedTicket(ticket)}>
+                <button type="button" aria-pressed={selectedTicket.id === ticket.id} onClick={() => setSelectedTicket(ticket)}>
                   <strong>{ticket.price}</strong>
                   <span>{ticket.label}</span>
                   <small>{ticket.note}</small>

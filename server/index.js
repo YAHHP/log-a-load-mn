@@ -244,12 +244,12 @@ export function createApp({ store = new JsonStore() } = {}) {
   return app
 }
 
-export async function startServer({ port = DEFAULT_PORT, store = new JsonStore() } = {}) {
+export async function startServer({ port = DEFAULT_PORT, host = process.env.HOST || '127.0.0.1', store = new JsonStore() } = {}) {
   await store.init()
   const app = createApp({ store })
   return new Promise((resolve) => {
-    const server = app.listen(port, () => {
-      resolve({ app, server, port: server.address().port, store })
+    const server = app.listen(port, host, () => {
+      resolve({ app, server, host, port: server.address().port, store })
     })
   })
 }
@@ -671,8 +671,8 @@ function corsMiddleware(req, res, next) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  startServer().then(({ port, store }) => {
-    console.log(`Log A Load Backend V1 listening on http://127.0.0.1:${port}`)
+  startServer().then(({ host, port, store }) => {
+    console.log(`Log A Load Backend V1 listening on http://${host}:${port}`)
     console.log(`Data file: ${store.filePath}`)
   })
 }

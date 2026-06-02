@@ -104,6 +104,8 @@ server/data/local-db.json
 
 That file is intentionally ignored by git.
 
+By default, Backend V1 binds to `127.0.0.1`, so it is local-only. Do not change `HOST` to `0.0.0.0` or expose the Mac through router/firewall rules for a public launch. Send reviewers the GitHub Pages URL for the public demo, not a local `127.0.0.1` or LAN URL.
+
 ## Payment Setup
 
 Do not collect or hold card data in this app. V1 should redirect to hosted provider checkout links owned by Log A Load Minnesota or the approved fiscal host.

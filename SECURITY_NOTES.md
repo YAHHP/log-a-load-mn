@@ -9,6 +9,7 @@
 - Payment URL env vars are public checkout links only. They are not secrets.
 - The public Admin nav is hidden and direct public admin access shows a locked handoff screen.
 - Backend V1 uses server-side `ADMIN_PASSWORD` auth and a local JSON datastore for prototype review.
+- Backend V1 binds to `127.0.0.1` by default. Keep it local-only unless it is deployed behind real hosting, TLS, auth, webhook verification, and a managed database.
 
 ## Frontend Payment Guardrails
 
@@ -42,3 +43,4 @@ If a link is not configured or fails validation, the checkout button falls back 
 - Keep a durable audit trail for admin edits, payment reconciliation, refunds, and CSV exports.
 - Keep security headers in `vercel.json` and `netlify.toml` active.
 - Do not deploy `server/data/local-db.json` as the long-term source of truth for public paid events. Move to managed persistence with backups before launch.
+- Do not expose the Mac or local Backend V1 directly to the public internet.
