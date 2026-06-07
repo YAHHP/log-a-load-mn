@@ -1,27 +1,21 @@
-# Log A Load Minnesota Event Hub
+# Log A Load Minnesota Charity Tickets
 
-Professional local prototype for a Log A Load Minnesota event fundraising website.
+Professional local prototype for a Log A Load Minnesota charity ticketing and donation website.
 
-The product direction is a multi-event charity hub, not a single truck-pull page. Mud Fest Hillman is the first featured event, and the same structure can support the golf event, truck pull, raffles, dinners, vendor rows, sponsor packages, tickets, donations, and admin tracking.
+The current public review direction is intentionally simple: one event, Hillman Mud Bog, with clear ticket sales, donation choices, vendor/sponsor interest, rules, and contact paths. The codebase still has a foundation for future events and admin operations, but the public UI should not feel like a messy multi-event dashboard.
 
 ## Pages
 
-- Home: QR-friendly landing page and cause positioning
-- Events: multi-event center for Mud Fest, truck pull, golf, and future fundraisers
-- Mud Fest: featured event page at `#/mudfest`
-- Truck Pull: draft event page at `#/events/truck-pull`
-- Golf Classic: draft event page at `#/events/golf-classic`
-- Tickets: Mud Fest v1 order builder with hosted checkout handoff
+- Home: straightforward charity/ticket landing page for the Hillman Mud Bog
+- Mud Bog: featured event page at `#/mudfest`
+- Tickets: Mud Bog v1 order builder with hosted checkout handoff
 - Donate: fund-specific donation path
-- Register: event-role signup for volunteers, competitors, golfers, sponsor reps, crew, and future event roles
 - Vendors: vendors and sponsor interest form
 - FAQ: rules, payment safety, contact form, and launch notes
 - Success: receipt-style return page for hosted checkout
-- Event Day: phone-first check-in/help mode at `#/event-day`
-- QR Kit: print/download QR code hub at `#/qr-kit`
 - Admin: locked public route with a local/demo-only dashboard blueprint for analytics, event edits, exports, ticket inventory, fund setup, and payment configuration
 
-Legacy local links `#/participants` and `#/pullers` still render the Register page so old review links do not break.
+Legacy local links `#/participants`, `#/pullers`, `#/events`, `#/event-day`, and `#/qr-kit` remain handled so old review links do not break, but they are not part of the public navigation.
 
 ## Run Locally
 
@@ -40,17 +34,11 @@ Common routes:
 
 ```text
 http://127.0.0.1:5177/#/
-http://127.0.0.1:5177/#/events
 http://127.0.0.1:5177/#/mudfest
-http://127.0.0.1:5177/#/events/truck-pull
-http://127.0.0.1:5177/#/events/golf-classic
 http://127.0.0.1:5177/#/tickets
 http://127.0.0.1:5177/#/donate
-http://127.0.0.1:5177/#/register
 http://127.0.0.1:5177/#/vendors
 http://127.0.0.1:5177/#/faq
-http://127.0.0.1:5177/#/event-day
-http://127.0.0.1:5177/#/qr-kit
 http://127.0.0.1:5177/#/admin
 ```
 
@@ -141,7 +129,7 @@ Helpful official docs:
 
 ## QR Codes
 
-The Home page uses real static QR SVGs in `public/` for the current GitHub Pages demo URLs.
+QR codes are removed from the public review UI based on customer feedback. Static QR SVGs still exist in `public/` as archived/internal assets in case the team wants printed signs later.
 
 Regenerate them after the final domain changes:
 
@@ -158,7 +146,7 @@ Current generated targets:
 - `public/qr-vendors.svg` -> `https://yahhp.github.io/log-a-load-mn/#/vendors`
 - `public/qr-event-day.svg` -> `https://yahhp.github.io/log-a-load-mn/#/event-day`
 
-## Mud Fest Ticket Assumptions
+## Mud Bog Ticket Assumptions
 
 Current prototype pricing is based on relayed notes and must be confirmed before launch:
 
@@ -167,7 +155,7 @@ Current prototype pricing is based on relayed notes and must be confirmed before
 - Pit pass: `$20`
 - Camping: `$40` per camper
 - Camping may include one admission pass, but that is not confirmed
-- Event content references food trucks, beer garden, camping, pit/action access, and Mud Fest host content
+- Event content references food trucks, beer garden, camping, pit/action access, and Mud Fest Hillman host content
 - Mud Fest host reference: `mudfesthillman.com`
 - Mud Fest images/logo are prototype review assets and need permission before production use
 
@@ -195,8 +183,7 @@ See `LAUNCH_CHECKLIST.md` and `SECURITY_NOTES.md` for the launch handoff.
 - Official logo file and approval to use co-brand marks
 - Cause/fund destination copy
 - Mud Fest date/weekend, address, child pricing wording, camping rules, pit pass policy, refund policy, and weather policy
-- Future truck pull date, address, classes, entry fee, and rules
-- Golf event date, address, team pricing, and sponsor tiers
+- Future truck pull/golf event details only if Log A Load wants to expand beyond the Mud Bog after this flow is approved
 - Vendor booth pricing, sizes, setup times, restrictions, and insurance wording
 - Ticket prices and check-in policy
 - Admin recipient emails

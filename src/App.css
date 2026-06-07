@@ -3336,6 +3336,329 @@ textarea {
   gap: 14px;
 }
 
+/* Clean charity-ticket theme pass. Keeps the existing layout, but removes the busier mud/orange-heavy read. */
+.site-shell {
+  background:
+    linear-gradient(180deg, #0f2f2c 0, #0f2f2c 320px, #f7faf7 320px);
+  color: #10201e;
+}
+
+.site-header {
+  background: rgba(248, 250, 247, 0.96);
+  border-bottom-color: rgba(15, 47, 44, 0.1);
+}
+
+.brand strong,
+.nav a:hover,
+.section h2,
+.feature-event h2,
+.admin-section h2,
+.payment-plan h2,
+.brief-copy h2,
+.schedule-section h2,
+.rules-panel h2,
+.video-panel h2,
+.confirmation-card h2,
+.next-steps-card h2,
+.setup-wizard h2,
+.admin-login-preview h2,
+.inventory-strip h2,
+.checkout-architecture h2,
+.admin-inventory-panel h2,
+.showcase-copy h2,
+.trust-flow h2,
+.impact-ledger h2,
+.network-copy h2,
+.page-intro h1 {
+  color: #10201e;
+}
+
+.nav {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(15, 47, 44, 0.12);
+}
+
+.nav a {
+  color: #304642;
+}
+
+.nav a.active {
+  color: #ffffff;
+  background: #0f5f55;
+}
+
+.primary-button {
+  color: #10201e;
+  background: #f2bd55;
+  box-shadow: 0 12px 22px rgba(180, 126, 37, 0.22);
+}
+
+.primary-button:hover {
+  background: #ffd36f;
+}
+
+.secondary-button,
+.ghost-button {
+  color: #123d38;
+  border-color: rgba(15, 95, 85, 0.2);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.eyebrow,
+.section-kicker,
+.panel-topline,
+.page-signal span,
+.network-grid span {
+  color: #2563eb;
+}
+
+.hero-section {
+  min-height: auto;
+  padding-block: clamp(46px, 7vw, 88px);
+  background:
+    linear-gradient(118deg, rgba(11, 42, 39, 0.96), rgba(19, 63, 85, 0.86) 55%, rgba(15, 95, 85, 0.82)),
+    radial-gradient(circle at 78% 22%, rgba(242, 189, 85, 0.24), transparent 28%),
+    linear-gradient(145deg, #0f2f2c 0%, #173f55 52%, #0f5f55 100%);
+  color: #f8fbf8;
+}
+
+.hero-section .eyebrow,
+.hero-signal-row svg {
+  color: #f2bd55;
+}
+
+.hero-content h1 {
+  max-width: 780px;
+  color: #ffffff;
+  font-size: 5.75rem;
+  line-height: 0.96;
+}
+
+.hero-copy {
+  max-width: 720px;
+  color: rgba(248, 251, 248, 0.88);
+}
+
+.truck-card {
+  background: rgba(13, 44, 41, 0.54);
+}
+
+.track-lane {
+  opacity: 0.38;
+}
+
+.hero-panel,
+.brief-copy,
+.rules-panel,
+.video-panel,
+.confirmation-card,
+.next-steps-card,
+.payment-status-panel,
+.event-detail-panel,
+.form-card,
+.ticket-product,
+.fund,
+.payment-method,
+.sponsor-tier,
+.sponsor-directory-card,
+.inventory-card,
+.trust-step,
+.architecture-steps span {
+  background: #ffffff;
+}
+
+.hero-panel {
+  border-color: rgba(15, 47, 44, 0.14);
+  box-shadow: 0 24px 58px rgba(7, 24, 22, 0.22);
+}
+
+.hero-ticket-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin: 16px 0;
+}
+
+.hero-ticket-list span {
+  display: grid;
+  gap: 3px;
+  min-height: 76px;
+  padding: 13px;
+  border: 1px solid rgba(15, 95, 85, 0.14);
+  border-radius: 8px;
+  background: #f4f8f4;
+}
+
+.hero-ticket-list strong {
+  color: #0f5f55;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.hero-ticket-list small {
+  color: #52615e;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.quick-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.quick-grid a {
+  color: #123d38;
+  background: #edf4f2;
+}
+
+.metrics-band,
+.trust-flow,
+.page-grid,
+.form-page-grid,
+.tickets-page,
+.event-brief,
+.rules-section,
+.home-action-strip,
+.mudfest-showcase {
+  background: #f7faf7;
+}
+
+.metric {
+  background: #ffffff;
+}
+
+.metric strong,
+.inventory-card strong,
+.ticket-product strong,
+.event-stats strong,
+.impact-report-grid strong {
+  color: #0f5f55;
+}
+
+.home-action-strip .scan-actions button {
+  background: #ffffff;
+  border-color: rgba(15, 47, 44, 0.1);
+}
+
+.home-action-strip .scan-actions button:hover {
+  border-color: rgba(37, 99, 235, 0.24);
+  background: #f4f8ff;
+}
+
+.mudfest-showcase,
+.inventory-strip,
+.checkout-architecture {
+  background: linear-gradient(180deg, #f7faf7, #eef5f1);
+}
+
+.showcase-board {
+  background:
+    linear-gradient(130deg, rgba(10, 35, 33, 0.94), rgba(22, 63, 85, 0.88)),
+    radial-gradient(circle at 72% 24%, rgba(242, 189, 85, 0.2), transparent 32%);
+}
+
+.showcase-tile strong,
+.schedule-card strong,
+.thank-you-wall strong,
+.site-footer a {
+  color: #f2bd55;
+}
+
+.schedule-section,
+.impact-ledger,
+.site-footer,
+.thank-you-wall,
+.compact-timeline {
+  background: #0f2f2c;
+}
+
+.schedule-section h2,
+.impact-ledger h2 {
+  color: #ffffff;
+}
+
+.impact-ledger {
+  background:
+    linear-gradient(112deg, rgba(15, 47, 44, 0.98), rgba(23, 63, 85, 0.92)),
+    linear-gradient(90deg, #0f2f2c, #173f55);
+}
+
+.ledger-card span,
+.event-art-mark {
+  color: #10201e;
+  background: #f2bd55;
+}
+
+.page-intro {
+  background:
+    linear-gradient(120deg, rgba(15, 47, 44, 0.98), rgba(23, 63, 85, 0.84)),
+    radial-gradient(circle at 74% 18%, rgba(242, 189, 85, 0.2), transparent 30%),
+    linear-gradient(90deg, #0f2f2c, #173f55);
+}
+
+.page-intro h1 {
+  color: #ffffff;
+}
+
+.page-intro p {
+  color: rgba(248, 251, 248, 0.78);
+}
+
+.page-signal svg,
+.network-grid svg,
+.trust-step svg,
+.rule-list svg,
+.next-steps-card svg {
+  color: #0f8f6f;
+}
+
+.event-card.active {
+  color: #ffffff;
+  background: linear-gradient(145deg, #0f5f55, #173f55);
+  box-shadow: 0 20px 48px rgba(15, 47, 44, 0.2);
+}
+
+.event-card:hover {
+  border-color: rgba(37, 99, 235, 0.28);
+}
+
+.inventory-bar i {
+  background: linear-gradient(90deg, #0f8f6f, #2563eb, #f2bd55);
+}
+
+.ticket-product.selected {
+  border-color: rgba(15, 95, 85, 0.22);
+  background: #f4f8f4;
+}
+
+.ticket-product.active {
+  border-color: #0f8f6f;
+  background: #eef9f3;
+  box-shadow:
+    inset 0 0 0 2px rgba(15, 143, 111, 0.76),
+    0 16px 36px rgba(35, 53, 42, 0.08);
+}
+
+.ticket-product em,
+.inventory-card.low,
+.sponsor-directory-card span {
+  background: #fff2ca;
+}
+
+.ticket-product em {
+  color: #10201e;
+}
+
+.fund.selected,
+.payment-method.selected {
+  border-color: #0f8f6f;
+  background: #eef9f3;
+  box-shadow: inset 0 0 0 2px rgba(15, 143, 111, 0.22);
+}
+
+.sponsor-directory-card a {
+  color: #2563eb;
+}
+
 @media (max-width: 1060px) {
   .nav,
   .ghost-button {
@@ -3580,5 +3903,27 @@ textarea {
   .site-footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+/* Final hero type sizing after the legacy responsive rules. */
+.hero-content h1 {
+  font-size: 5.75rem;
+}
+
+@media (max-width: 1060px) {
+  .hero-content h1 {
+    font-size: 4.75rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero-content h1 {
+    font-size: 3.35rem;
+    line-height: 1.02;
+  }
+
+  .hero-copy {
+    font-size: 1.06rem;
   }
 }

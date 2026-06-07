@@ -21,7 +21,6 @@ import {
   Menu,
   Mountain,
   PlusCircle,
-  QrCode,
   ReceiptText,
   Settings2,
   ShieldCheck,
@@ -37,10 +36,8 @@ import { apiExportUrl, apiGet, apiPost, apiPut, getAdminToken, hasApiBase, setAd
 
 const routes = [
   { path: '/', label: 'Home' },
-  { path: '/events', label: 'Events' },
   { path: '/tickets', label: 'Tickets' },
   { path: '/donate', label: 'Donate' },
-  { path: '/register', label: 'Register' },
   { path: '/vendors', label: 'Vendors' },
   { path: '/faq', label: 'FAQ' },
 ]
@@ -48,7 +45,7 @@ const routes = [
 const events = [
   {
     id: 'mud-fest',
-    label: 'Mud Fest Hillman',
+    label: 'Hillman Mud Bog',
     pagePath: '/mudfest',
     date: 'Memorial & Labor Day 2026',
     location: 'Hillman, Minnesota',
@@ -60,14 +57,14 @@ const events = [
     icon: Mountain,
     audience: 'Families, truck fans, campers',
     impact: 'Tickets + donations feed the launch charity lane.',
-    actionLabel: 'Open Mud Fest page',
+    actionLabel: 'Open Mud Bog page',
     hostUrl: 'https://mudfesthillman.com',
     hostLabel: 'Official Mud Fest site',
     hostNote: 'Host event site for full Mud Fest background.',
     qrImage: 'qr-mudfest.svg',
     eventDayNote: 'Bring hosted payment receipt to gate check-in. Camping, pit pass, and kids-ticket wording still need final approval.',
-    reportNote: 'Launch-event report will show tickets sold, donations by fund, sponsor support, and event photos after Mud Fest.',
-    summary: 'Log A Load charity ticketing and donation lane for Mud Fest: food, trucks, beer gardens, camping, pits, kids tickets, and fund selection.',
+    reportNote: 'Launch-event report will show tickets sold, donations by fund, sponsor support, and event photos after the Mud Bog.',
+    summary: 'Log A Load charity ticketing and donation lane for the Hillman Mud Bog: food, trucks, beer gardens, camping, pits, kids tickets, and fund selection.',
     schedule: ['Gates Friday 8:00 AM', 'Food trucks + vendors', 'Beer garden', 'Camping + pit access'],
   },
   {
@@ -121,14 +118,14 @@ const events = [
 ]
 
 const funds = [
-  { id: 'mud-fest', label: 'Mud Fest Charity Fund', note: 'Ticket proceeds and event donations tied to the Hillman Mud Fest charity lane.' },
+  { id: 'mud-fest', label: 'Mud Bog Charity Fund', note: 'Ticket proceeds and event donations tied to the Hillman Mud Bog charity lane.' },
   { id: 'cmn', label: 'Children’s Miracle Network', note: 'Route the donor gift toward the core Log A Load children’s hospital mission.' },
   { id: 'local-family', label: 'Local Family Support', note: 'A donor-friendly lane for people who want the gift focused close to home.' },
   { id: 'general', label: 'Where it helps most', note: 'Lets Log A Load direct the gift to the highest-priority fundraiser need.' },
 ]
 
 const ticketOptions = [
-  { id: 'general', amount: 15, capacity: 1500, sold: 842, price: '$15', label: 'General admission', note: 'Mud Fest entry ticket through the Log A Load charity lane.' },
+  { id: 'general', amount: 15, capacity: 1500, sold: 842, price: '$15', label: 'General admission', note: 'Mud Bog entry ticket through the Log A Load charity lane.' },
   { id: 'kids', amount: 5, capacity: 500, sold: 188, price: '$5', label: 'Kids 12 and under', note: 'Confirm final wording before launch.' },
   { id: 'pit', amount: 20, capacity: 220, sold: 171, price: '$20', label: 'Pit pass', note: 'Closer access to the action; must follow event safety rules.' },
   { id: 'camping', amount: 40, capacity: 80, sold: 62, price: '$40', label: 'Camping pass', note: 'Per camper. Confirm whether admission is included.' },
@@ -180,8 +177,6 @@ const paymentLinks = {
   stripeDonate: safeHostedPaymentUrl(import.meta.env.VITE_STRIPE_DONATE_URL),
 }
 
-const publicSiteUrl = 'https://yahhp.github.io/log-a-load-mn/'
-
 function assetPath(filename) {
   return `${import.meta.env.BASE_URL}${filename}`
 }
@@ -200,50 +195,23 @@ const trustSteps = [
   { icon: ReceiptText, title: '4. Admin reconciles', copy: 'Every order can become a check-in row, donor record, and export.' },
 ]
 
-const eventNetwork = [
-  { icon: Mountain, status: 'Featured now', title: 'Mud Fest Hillman', copy: 'Tickets, camping, pit passes, donations, vendors, and QR-code checkout in one lane.' },
-  { icon: Tractor, status: 'Template ready', title: 'Truck Pull', copy: 'Rules, classes, vehicle info, event registration, sponsors, and gate check-in.' },
-  { icon: Trophy, status: 'Existing fundraiser', title: 'Golf Classic', copy: 'Teams, hole sponsors, banquet tickets, raffle funds, and sponsor recognition.' },
-  { icon: PlusCircle, status: 'Expandable', title: 'Next Minnesota event', copy: 'A repeatable structure for dinners, raffles, auctions, rides, or local benefit events.' },
-]
-
 const homeSignals = [
-  { icon: QrCode, label: 'QR first', value: 'Scan to event action', detail: 'Home is built for phones, signs, flyers, and event-day traffic.' },
-  { icon: Wallet, label: 'Hosted payment', value: 'PayPal-ready path', detail: 'Checkout can launch through provider-owned links before a full backend.' },
-  { icon: LayoutDashboard, label: 'Admin future', value: 'Track every lane', detail: 'Tickets, donations, vendors, registrations, and exports belong in one dashboard.' },
-]
-
-const qrTargets = [
-  { image: 'qr-mudfest.svg', label: 'Mud Fest landing', path: '/mudfest', url: `${publicSiteUrl}#/mudfest`, icon: Mountain, detail: 'Event overview, tickets, donations, rules, and contact.' },
-  { image: 'qr-tickets.svg', label: 'Buy tickets', path: '/tickets', url: `${publicSiteUrl}#/tickets`, icon: Ticket, detail: 'General admission, kids, pit pass, and camping lanes.' },
-  { image: 'qr-donate.svg', label: 'Donate', path: '/donate', url: `${publicSiteUrl}#/donate`, icon: BadgeDollarSign, detail: 'Pick the fund before going to hosted checkout.' },
-  { image: 'qr-register.svg', label: 'Register', path: '/register', url: `${publicSiteUrl}#/register`, icon: ClipboardList, detail: 'Volunteer, puller, golfer, crew, vendor, or sponsor intake.' },
-]
-
-const qrKitTargets = [
-  ...qrTargets,
-  { image: 'qr-vendors.svg', label: 'Vendors + sponsors', path: '/vendors', url: `${publicSiteUrl}#/vendors`, icon: Store, detail: 'Vendor, food truck, booth, and sponsor interest.' },
-  { image: 'qr-event-day.svg', label: 'Event-day mode', path: '/event-day', url: `${publicSiteUrl}#/event-day`, icon: Gauge, detail: 'Check-in, receipt, camping, pit pass, weather, and contact help.' },
-]
-
-const eventDayCards = [
-  { icon: ReceiptText, title: 'Show receipt', detail: 'Open the success/receipt screen or payment provider email before reaching the gate.', action: 'Open receipt preview', path: '/success?flow=tickets&method=PayPal&preview=true&total=$15' },
-  { icon: Ticket, title: 'Gate check-in', detail: 'Have buyer name, email receipt, ticket type, and camping/pit pass notes ready for staff.', action: 'Buy or review tickets', path: '/tickets' },
-  { icon: Mountain, title: 'Camping + pit pass', detail: 'Show camping and pit rules before visitors ask at the line. Final wording still needs approval.', action: 'Read rules', path: '/faq' },
-  { icon: Mail, title: 'Event help', detail: 'Route payment issues, vendor arrival questions, and check-in questions to the event team.', action: 'Contact team', path: '/faq' },
+  { icon: HandHeart, label: 'Charity site', value: 'Log A Load MN', detail: 'A clear place to support the fundraiser and understand the cause.' },
+  { icon: Ticket, label: 'Mud Bog tickets', value: 'Buy passes', detail: 'Admission, kids, pit, and camping options stay easy to compare.' },
+  { icon: Wallet, label: 'Donation choice', value: 'Pick a fund', detail: 'Donors can choose where the extra gift should be directed.' },
 ]
 
 const sponsorDirectory = [
-  { name: 'Mud Fest Hillman', tier: 'Host event partner', event: 'Mud Fest Hillman', status: 'Featured', url: 'https://mudfesthillman.com', detail: 'Host event website and primary Mud Fest reference.' },
+  { name: 'Mud Fest Hillman', tier: 'Host event partner', event: 'Hillman Mud Bog', status: 'Featured', url: 'https://mudfesthillman.com', detail: 'Host event website and primary event reference.' },
   { name: 'North Star Logging', tier: 'Hole sponsor', event: 'Golf Classic', status: 'Invoice', url: '', detail: 'Demo sponsor row for golf fundraiser packages.' },
-  { name: 'Food truck lane', tier: 'Vendor row', event: 'Mud Fest Hillman', status: 'Open', url: '', detail: 'Public vendor directory can list menu, booth needs, and arrival window.' },
-  { name: 'Title Charity Sponsor', tier: '$1,000+ package', event: 'All events', status: 'Available', url: '', detail: 'Premium sponsor placement across event page, QR booth, and thank-you recap.' },
+  { name: 'Food truck lane', tier: 'Vendor row', event: 'Hillman Mud Bog', status: 'Open', url: '', detail: 'Public vendor directory can list menu, booth needs, and arrival window.' },
+  { name: 'Title Charity Sponsor', tier: '$1,000+ package', event: 'Hillman Mud Bog', status: 'Available', url: '', detail: 'Premium sponsor placement across the event page, charity booth, and thank-you recap.' },
 ]
 
 const impactReportMetrics = [
   { label: 'Raised so far', value: '$12,640', detail: 'Prototype launch metric until real payment records connect.' },
   { label: 'Tickets modeled', value: '1,263', detail: 'Frontend inventory demo across GA, kids, pit, and camping.' },
-  { label: 'Fund lanes', value: '4', detail: 'Mud Fest, CMN, local family support, and general giving.' },
+  { label: 'Fund lanes', value: '4', detail: 'Mud Bog, CMN, local family support, and general giving.' },
   { label: 'After-event recap', value: 'Ready', detail: 'Photos, sponsor thanks, and final fund totals can publish here.' },
 ]
 
@@ -255,8 +223,8 @@ const thankYouWall = [
 ]
 
 const participantOptions = [
-  { option: 'Mud Fest volunteer shift', event: 'Mud Fest Hillman', cap: 24, registered: 9, fee: 'Free', status: 'Open', detail: 'Gate help, merch table, donation QR booth, or setup crew.' },
-  { option: 'Camping check-in crew', event: 'Mud Fest Hillman', cap: 8, registered: 3, fee: 'Free', status: 'Open', detail: 'Arrival windows, camper notes, and event-day phone number.' },
+  { option: 'Mud Bog volunteer shift', event: 'Hillman Mud Bog', cap: 24, registered: 9, fee: 'Free', status: 'Open', detail: 'Gate help, merch table, donation booth, or setup crew.' },
+  { option: 'Camping check-in crew', event: 'Hillman Mud Bog', cap: 8, registered: 3, fee: 'Free', status: 'Open', detail: 'Arrival windows, camper notes, and event-day phone number.' },
   { option: 'Truck puller registration', event: 'Truck Pull', cap: 48, registered: 12, fee: 'TBD', status: 'Planning', detail: 'Driver contact, class, vehicle name, hometown, sponsor, and rules acknowledgement.' },
   { option: 'Golf team / sponsor signup', event: 'Golf Classic', cap: 36, registered: 10, fee: 'TBD', status: 'Draft', detail: 'Team captain, player count, sponsor tier, and dinner/raffle notes.' },
 ]
@@ -266,13 +234,13 @@ const vendors = [
   { name: 'Food truck lane', type: 'Food vendor group', status: 'Open', url: 'Vendor page pending' },
   { name: 'Beer garden sponsor', type: 'Sponsor', status: 'Review', url: 'Sponsor page pending' },
   { name: 'Camping check-in', type: 'Operations', status: 'Setup needed', url: 'Admin workflow pending' },
-  { name: 'Log A Load booth', type: 'Charity presence', status: 'Approved', url: 'Donation QR station' },
+  { name: 'Log A Load booth', type: 'Charity presence', status: 'Approved', url: 'Donation table' },
 ]
 
 const sponsorTiers = [
   { name: 'Trail Sponsor', price: '$250', detail: 'Logo on event page, thank-you post, and booth mention.' },
   { name: 'Pit Sponsor', price: '$500', detail: 'Promoted placement near pit pass/ticket areas and vendor list.' },
-  { name: 'Title Charity Sponsor', price: '$1,000+', detail: 'Hero placement, QR station recognition, and admin follow-up lane.' },
+  { name: 'Title Charity Sponsor', price: '$1,000+', detail: 'Hero placement, event-page recognition, and admin follow-up lane.' },
 ]
 
 const adminRows = [
@@ -285,9 +253,9 @@ const adminRows = [
 
 const mudFestSchedule = [
   { label: 'Gates + camping check-in', detail: 'Friday morning launch window, final public times still need customer approval.' },
-  { label: 'Food trucks + vendors', detail: 'Vendor row, sponsor booths, Log A Load QR donation station, and family area.' },
+  { label: 'Food trucks + vendors', detail: 'Vendor row, sponsor booths, Log A Load donation table, and family area.' },
   { label: 'Beer garden + pit access', detail: 'Pit pass buyers get closer access while safety rules stay visible before purchase.' },
-  { label: 'Mud trucks + event action', detail: 'Mud Fest stays the host event; Log A Load handles charity ticketing and donations.' },
+  { label: 'Mud trucks + event action', detail: 'Mud Fest Hillman stays the host event; Log A Load handles charity ticketing and donations.' },
 ]
 
 const mudFestRules = [
@@ -295,33 +263,33 @@ const mudFestRules = [
   'Kids 12 and under ticket wording is $5 in the prototype and needs final confirmation.',
   'Camping is listed as $40 per camper; confirm whether one admission pass is included.',
   'Pit pass buyers must follow posted safety boundaries and event staff instructions.',
-  'Ticket receipt should be shown at check-in until barcode scanning is connected.',
+  'Ticket receipt should be shown at check-in until digital ticket validation is connected.',
 ]
 
 const faqItems = [
-  { question: 'Is this the official Mud Fest site?', answer: 'This is the Log A Load Minnesota charity ticket and donation lane for Mud Fest. Mud Fest can keep its host event site while this page handles charity checkout, donation routing, and admin records.' },
-  { question: 'Where does the money go?', answer: 'Ticket proceeds and optional donations are tracked by fund so Log A Load can reconcile Mud Fest proceeds, Children’s Miracle Network giving, local support, and general charity needs.' },
+  { question: 'Is this the official Mud Fest site?', answer: 'This is the Log A Load Minnesota charity ticket and donation lane for the Hillman Mud Bog. Mud Fest Hillman can keep its host event site while this page handles charity checkout, donation routing, and admin records.' },
+  { question: 'Where does the money go?', answer: 'Ticket proceeds and optional donations are tracked by fund so Log A Load can reconcile Mud Bog proceeds, Children’s Miracle Network giving, local support, and general charity needs.' },
   { question: 'Can I pay with PayPal, Venmo, or card?', answer: 'The v1 plan is PayPal first. Venmo and Stripe/Card are shown as supported/future-ready options and can be connected with hosted links once the organization owns the accounts.' },
   { question: 'Do you store my card number?', answer: 'No. This site should redirect to PayPal or Stripe hosted checkout. Card data stays with the payment provider, not this website.' },
   { question: 'Who do I contact for vendor or sponsor questions?', answer: 'Use the vendor/sponsor form on this site for v1. Production should route those submissions to the approved admin email list.' },
 ]
 
 const adminSetupSteps = [
-  { title: 'Create event', detail: 'Title, date, location, hero copy, photos, videos, and QR path.' },
+  { title: 'Create event', detail: 'Title, date, location, hero copy, photos, videos, and public link.' },
   { title: 'Add tickets', detail: 'Price, inventory notes, legal wording, refund policy, and check-in instructions.' },
-  { title: 'Choose funds', detail: 'Mud Fest fund, CMN, local support, and general giving options.' },
-  { title: 'Publish links', detail: 'PayPal/Stripe hosted links, vendor form, QR code, and success URL.' },
+  { title: 'Choose funds', detail: 'Mud Bog fund, CMN, local support, and general giving options.' },
+  { title: 'Publish links', detail: 'PayPal/Stripe hosted links, vendor form, public event link, and success URL.' },
 ]
 
 const adminExportData = {
   orders: adminRows.map(({ id, type, name, event, detail, status, amount, method }) => ({ id, type, name, event, detail, status, amount, method })),
-  tickets: ticketOptions.map(({ id, label, price, note }) => ({ id, label, price, note, event: 'Mud Fest Hillman' })),
+  tickets: ticketOptions.map(({ id, label, price, note }) => ({ id, label, price, note, event: 'Hillman Mud Bog' })),
   funds: funds.map(({ id, label, note }) => ({ id, label, note })),
   vendors: vendors.map(({ name, type, status, url }) => ({ name, type, status, url })),
 }
 
 const trafficMetrics = [
-  { label: 'QR scans today', value: '312', detail: 'Preview analytics placeholder' },
+  { label: 'Visitors today', value: '312', detail: 'Preview analytics placeholder' },
   { label: 'Mobile visitors', value: '81%', detail: 'iPhone-first layout priority' },
   { label: 'Checkout starts', value: '74', detail: 'Ticket and donation intents' },
   { label: 'Admin exports', value: '4', detail: 'Orders, tickets, funds, vendors' },
@@ -329,9 +297,9 @@ const trafficMetrics = [
 
 const pageSignals = {
   tickets: [
-    { icon: Mountain, label: 'Featured event', value: 'Mud Fest Hillman', detail: 'Tickets, pit passes, kids pricing, and camping.' },
+    { icon: Mountain, label: 'Featured event', value: 'Hillman Mud Bog', detail: 'Tickets, pit passes, kids pricing, and camping.' },
     { icon: ShieldCheck, label: 'Checkout safety', value: 'Hosted payment', detail: 'PayPal first. No card data stored here.' },
-    { icon: ReceiptText, label: 'Gate handoff', value: 'Receipt check-in', detail: 'Provider receipt now; barcode flow later.' },
+    { icon: ReceiptText, label: 'Gate handoff', value: 'Receipt check-in', detail: 'Provider receipt now; digital validation later.' },
   ],
   donate: [
     { icon: BadgeDollarSign, label: 'Fund choice', value: '4 charity lanes', detail: 'Donors can direct intent before payment.' },
@@ -371,12 +339,6 @@ const ticketInventory = ticketOptions.map((ticket) => {
   const percentSold = Math.round((ticket.sold / ticket.capacity) * 100)
   return { ...ticket, remaining, percentSold }
 })
-
-const checkoutPlan = [
-  { title: 'Hosted checkout now', detail: 'PayPal or Stripe Payment Links can accept the money without this site touching card data.' },
-  { title: 'Inventory needs records', detail: 'Low-ticket warnings and sold-out locks need a database or provider inventory limit, plus payment webhooks.' },
-  { title: 'Admin reconciles daily', detail: 'Orders, funds, tickets, vendor forms, and payment reports should export cleanly for check-in.' },
-]
 
 function getRoute() {
   const hash = window.location.hash.replace('#', '')
@@ -507,10 +469,10 @@ function App() {
 
   const metrics = useMemo(
     () => [
-      { label: 'Launch event', value: 'Mud Fest', detail: 'Hillman charity ticket lane' },
-      { label: 'Event templates', value: '3', detail: 'Mud Fest, truck pull, golf' },
+      { label: 'Current event', value: 'Mud Bog', detail: 'Hillman fundraiser' },
+      { label: 'Ticket types', value: '4', detail: 'Admission, kids, pit, camping' },
       { label: 'Launch goal', value: '$40K', detail: 'Tickets + event donations' },
-      { label: 'Payment plan', value: 'PayPal', detail: 'Stripe + Venmo ready' },
+      { label: 'Checkout plan', value: 'PayPal', detail: 'Hosted payment first' },
     ],
     [],
   )
@@ -630,8 +592,8 @@ function App() {
         {route === '/mudfest' && <MudFestPage go={go} />}
         {routedEvent && route !== '/mudfest' && <EventDetailPage event={routedEvent} go={go} />}
         {route === '/events' && <EventsPage selectedEvent={selectedEvent} setSelectedEvent={setSelectedEvent} go={go} />}
-        {route === '/event-day' && <EventDayPage go={go} />}
-        {route === '/qr-kit' && <QrKitPage go={go} />}
+        {route === '/event-day' && <FaqPage handleSubmit={handleSubmit} />}
+        {route === '/qr-kit' && <HomePage metrics={metrics} go={go} />}
         {route === '/donate' && <DonatePage selectedFund={selectedFund} setSelectedFund={setSelectedFund} selectedPayment={selectedPayment} setSelectedPayment={setSelectedPayment} handleHostedPayment={handleHostedPayment} />}
         {route === '/tickets' && <TicketsPage selectedTicket={selectedTicket} setSelectedTicket={setSelectedTicket} selectedPayment={selectedPayment} setSelectedPayment={setSelectedPayment} ticketQuantities={ticketQuantities} updateTicketQuantity={updateTicketQuantity} handleHostedPayment={handleHostedPayment} />}
         {(route === '/register' || route === '/participants' || route === '/pullers') && <ParticipantsPage handleSubmit={handleSubmit} />}
@@ -647,9 +609,9 @@ function App() {
 
 function Header({ route, mobileOpen, setMobileOpen }) {
   const activeRoute = route === '/mudfest' || route.startsWith('/events/') || route === '/event-day'
-    ? '/events'
+    ? '/'
     : route === '/pullers' || route === '/participants'
-      ? '/register'
+      ? '/'
       : route === '/qr-kit'
         ? '/'
         : route
@@ -660,7 +622,7 @@ function Header({ route, mobileOpen, setMobileOpen }) {
         <img src={assetPath('log-a-load-cobrand-logo.avif')} alt="Log A Load for Kids and Children's Miracle Network Hospitals logo" decoding="async" />
         <span>
           <strong>Log A Load MN</strong>
-          <small>Local Event Hub</small>
+          <small>Charity Tickets</small>
         </span>
       </a>
       <nav className={mobileOpen ? 'nav open' : 'nav'} aria-label="Primary navigation">
@@ -682,10 +644,10 @@ function Header({ route, mobileOpen, setMobileOpen }) {
 
 function HomePage({ metrics, go }) {
   const quickActions = [
-    { path: '/tickets', icon: Ticket, label: 'Buy tickets', detail: 'Start the Mud Fest order.' },
-    { path: '/donate', icon: BadgeDollarSign, label: 'Donate', detail: 'Choose the charity fund.' },
-    { path: '/events', icon: CalendarDays, label: 'Browse events', detail: 'See all Minnesota fundraisers.' },
-    { path: '/register', icon: ClipboardList, label: 'Register', detail: 'Volunteer, puller, golfer, or vendor.' },
+    { path: '/tickets', icon: Ticket, label: 'Buy Mud Bog tickets', detail: 'Admission, kids, pit, and camping.' },
+    { path: '/donate', icon: BadgeDollarSign, label: 'Donate to the cause', detail: 'Choose the charity fund before checkout.' },
+    { path: '/vendors', icon: Store, label: 'Vendor or sponsor', detail: 'Food, booth, and sponsor interest.' },
+    { path: '/faq', icon: FileText, label: 'Rules and FAQ', detail: 'Pricing notes, payment safety, and event questions.' },
   ]
 
   return (
@@ -694,22 +656,22 @@ function HomePage({ metrics, go }) {
         <div className="hero-media" aria-hidden="true">
           <div className="tree-line" />
           <div className="track-lane" />
-          <div className="truck-card"><Gauge size={22} /><span>Minnesota event command center</span></div>
+          <div className="truck-card"><HandHeart size={22} /><span>Charity tickets + donations</span></div>
         </div>
         <div className="hero-content">
-          <div className="eyebrow"><HandHeart size={16} /> Log A Load Minnesota event hub</div>
+          <div className="eyebrow"><HandHeart size={16} /> Log A Load Minnesota charity fundraiser</div>
           <div className="event-logo-lockup">
             <img src={assetPath('mudfest-logo.png')} alt="Mud Fest Hillman logo" decoding="async" />
-            <span>Launch event: Mud Fest Hillman</span>
+            <span>Current event: Hillman Mud Bog</span>
           </div>
-          <h1>Scan once. Pick the event. Fund the cause.</h1>
+          <h1>Buy Mud Bog tickets. Support the cause.</h1>
           <p className="hero-copy">
-            Log A Load Minnesota gets a phone-first home base for QR traffic: tickets, donations, event registration, vendors, sponsors, rules, and receipts. Mud Fest Hillman is the launch fundraiser, and the same structure can carry truck pulls, golf, raffles, dinners, and future events.
+            This is the Log A Load Minnesota charity ticket and donation page for the Hillman Mud Bog. Buy admission, pit passes, kids tickets, and camping, add a donation if you want, and see where the money is going.
           </p>
           <div className="hero-actions">
-            <button className="primary-button large" type="button" onClick={() => go('/tickets')}>Buy Mud Fest tickets <ArrowRight size={18} /></button>
-            <button className="secondary-button large" type="button" onClick={() => go('/events')}>Browse events</button>
+            <button className="primary-button large" type="button" onClick={() => go('/tickets')}>Buy Mud Bog tickets <ArrowRight size={18} /></button>
             <button className="secondary-button large" type="button" onClick={() => go('/donate')}>Donate now</button>
+            <button className="secondary-button large" type="button" onClick={() => go('/vendors')}>Vendor or sponsor info</button>
           </div>
           <div className="hero-signal-row" aria-label="Home page priorities">
             {homeSignals.map((signal) => {
@@ -726,16 +688,20 @@ function HomePage({ metrics, go }) {
         </div>
         <aside className="hero-panel" aria-label="Event quick actions">
           <img className="hero-panel-photo" src={assetPath('mudfest-2024-event.jpg')} alt="Mud Fest trucks and off-road event preview" decoding="async" />
-          <div className="panel-topline">Working QR target</div>
-          <h2>Scan the code to open the Mud Fest charity landing page.</h2>
-          <QrPanel target={qrTargets[0]} />
+          <div className="panel-topline">Hillman Mud Bog fundraiser</div>
+          <h2>One clean place for tickets, donations, and event questions.</h2>
+          <div className="hero-ticket-list" aria-label="Mud Bog ticket options">
+            {ticketOptions.map((ticket) => (
+              <span key={ticket.id}>
+                <strong>{ticket.price}</strong>
+                <small>{ticket.label}</small>
+              </span>
+            ))}
+          </div>
           <div className="quick-grid">
             <a href="#/tickets"><Ticket size={17} /> Buy tickets</a>
-            <a href="#/donate"><BadgeDollarSign size={17} /> Choose fund</a>
-            <a href="#/events"><CalendarDays size={17} /> Event center</a>
-            <a href="#/register"><ClipboardList size={17} /> Register</a>
-            <a href="#/event-day"><Gauge size={17} /> Event-day</a>
-            <a href="#/qr-kit"><QrCode size={17} /> QR kit</a>
+            <a href="#/donate"><BadgeDollarSign size={17} /> Donate</a>
+            <a href="#/vendors"><Store size={17} /> Vendors</a>
             <a href="#/faq"><FileText size={17} /> Rules</a>
           </div>
         </aside>
@@ -754,7 +720,7 @@ function HomePage({ metrics, go }) {
       <section className="home-action-strip" aria-label="Visitor quick actions">
         <div>
           <div className="section-kicker"><ArrowRight size={16} /> Fast lane</div>
-          <h2>Most visitors need one of these four paths.</h2>
+          <h2>Most visitors only need one of these paths.</h2>
         </div>
         <div className="scan-actions">
           {quickActions.map((action) => {
@@ -769,25 +735,10 @@ function HomePage({ metrics, go }) {
         </div>
       </section>
 
-      <section className="scan-strip" aria-label="QR code quick paths">
-        <div>
-          <div className="section-kicker"><QrCode size={16} /> Working QR codes</div>
-          <h2>Print-ready QR paths for the event table, flyers, and signs.</h2>
-          <p>Each code opens a real public page on the current GitHub Pages demo. When the final domain is ready, regenerate the QR files with the new URL.</p>
-        </div>
-        <div className="qr-action-grid">
-          {qrTargets.map((target) => <QrRouteCard target={target} go={go} key={target.label} />)}
-        </div>
-      </section>
-
       <MudFestExperience go={go} />
-      <EventNetwork go={go} />
       <TicketInventoryStrip />
       <TrustFlow />
-      <CheckoutArchitecture />
       <ImpactLedger go={go} />
-      <ImpactReportSection />
-      <ReviewSection />
     </>
   )
 }
@@ -797,17 +748,17 @@ function MudFestExperience({ go }) {
     <section className="mudfest-showcase">
       <div className="showcase-copy">
         <div className="section-kicker"><Mountain size={16} /> Featured event</div>
-        <h2>Mud Fest gets the energy. Log A Load gets the clean charity lane.</h2>
+        <h2>The Mud Bog gets the energy. Log A Load makes the giving simple.</h2>
         <p>
-          The host event can keep its own site. This page gives sponsors, families, and QR-code buyers the simple charity purchase path:
+          The host event can keep its own site. This page gives sponsors, families, and ticket buyers the simple charity purchase path:
           tickets, optional fund selection, payment, receipt, and admin tracking.
         </p>
         <div className="hero-actions">
           <button className="primary-button large" type="button" onClick={() => go('/tickets')}>Start ticket order</button>
-          <button className="secondary-button large" type="button" onClick={() => go('/events')}>View event center</button>
+          <button className="secondary-button large" type="button" onClick={() => go('/donate')}>Choose donation fund</button>
         </div>
       </div>
-      <div className="showcase-board" aria-label="Mud Fest highlights">
+      <div className="showcase-board" aria-label="Mud Bog highlights">
         <div className="mud-track" />
         <img className="showcase-photo main-photo" src={assetPath('mudfest-2024.jpg')} alt="Mud Fest off-road event crowd and vehicles" loading="lazy" decoding="async" />
         <img className="showcase-photo side-photo" src={assetPath('mudfest-2024-event.jpg')} alt="Mud Fest event action preview" loading="lazy" decoding="async" />
@@ -828,8 +779,8 @@ function MudFestPage({ go }) {
       <PageIntro
         kicker="Mud Fest Hillman"
         icon={Mountain}
-        title="The Mud Fest charity lane is ready for tickets, funds, and QR traffic."
-        copy="Mud Fest keeps the event energy. Log A Load Minnesota gets a professional path for admission, pit passes, camping, donations, sponsor visibility, and admin records."
+        title="The Mud Bog charity lane is ready for tickets, funds, and event updates."
+        copy="Mud Fest Hillman keeps the event energy. Log A Load Minnesota gets a professional path for admission, pit passes, camping, donations, sponsor visibility, and admin records."
       />
       <section className="event-brief">
         <div className="brief-media">
@@ -842,15 +793,14 @@ function MudFestPage({ go }) {
         </div>
         <div className="brief-copy">
           <div className="section-kicker"><Ticket size={16} /> Launch event</div>
-          <h2>Everything a visitor needs after scanning the QR code.</h2>
+          <h2>Everything a visitor needs before buying or donating.</h2>
           <p>
-            Buyers should not need to hunt around for price notes, payment choices, rules, or where the money goes. This page makes the Mud Fest path obvious:
+            Buyers should not need to hunt around for price notes, payment choices, rules, or where the money goes. This page makes the Mud Bog path obvious:
             buy tickets, add a donation, understand the cause, and know what still needs final confirmation before public launch.
           </p>
           <div className="hero-actions">
-            <button className="primary-button large" type="button" onClick={() => go('/tickets')}>Buy Mud Fest tickets</button>
+            <button className="primary-button large" type="button" onClick={() => go('/tickets')}>Buy Mud Bog tickets</button>
             <button className="secondary-button large" type="button" onClick={() => go('/donate')}>Donate to a fund</button>
-            <button className="secondary-button large" type="button" onClick={() => go('/event-day')}>Event-day mode</button>
             <button className="secondary-button large" type="button" onClick={() => go('/faq')}>Rules + contact</button>
           </div>
           <EventActionPanel event={events[0]} go={go} compact />
@@ -860,7 +810,7 @@ function MudFestPage({ go }) {
       <section className="schedule-section">
         <div>
           <div className="section-kicker"><CalendarDays size={16} /> Event flow</div>
-          <h2>Mud Fest highlights, ticketed through the charity page.</h2>
+          <h2>Mud Bog highlights, ticketed through the charity page.</h2>
         </div>
         <div className="schedule-grid">
           {mudFestSchedule.map((item) => (
@@ -898,42 +848,9 @@ function MudFestPage({ go }) {
   )
 }
 
-function EventNetwork({ go }) {
-  return (
-    <section className="event-network">
-      <div className="network-copy">
-        <div className="section-kicker"><CalendarDays size={16} /> Minnesota event system</div>
-        <h2>One professional hub, many local fundraisers.</h2>
-        <p>
-          The public pages should feel easy for a QR-code visitor, but the structure underneath needs to repeat. Each event can have its own tickets,
-          donation funds, registration forms, vendor list, sponsors, videos, photos, and admin tracking.
-        </p>
-        <div className="hero-actions">
-          <button className="primary-button large" type="button" onClick={() => go('/events')}>Browse event center</button>
-          <button className="secondary-button large" type="button" onClick={() => go('/register')}>Open event registration</button>
-        </div>
-      </div>
-      <div className="network-grid" aria-label="Event platform examples">
-        {eventNetwork.map((item) => {
-          const Icon = item.icon
-          const matchingEvent = events.find((event) => event.label === item.title)
-          return (
-            <button type="button" key={item.title} onClick={() => go(matchingEvent?.pagePath || '/events')}>
-              <Icon size={24} />
-              <span>{item.status}</span>
-              <strong>{item.title}</strong>
-              <small>{item.copy}</small>
-            </button>
-          )
-        })}
-      </div>
-    </section>
-  )
-}
-
 function TicketInventoryStrip() {
   return (
-    <section className="inventory-strip" aria-label="Mud Fest ticket availability">
+    <section className="inventory-strip" aria-label="Mud Bog ticket availability">
       <div>
         <div className="section-kicker"><Ticket size={16} /> Ticket availability</div>
         <h2>Show buyers what is still available before they wait in line.</h2>
@@ -975,29 +892,6 @@ function TrustFlow() {
   )
 }
 
-function CheckoutArchitecture() {
-  return (
-    <section className="checkout-architecture">
-      <div>
-        <div className="section-kicker"><Globe2 size={16} /> Payment + inventory plan</div>
-        <h2>Payments can launch with hosted links. Ticket limits need a real backend.</h2>
-        <p>
-          GitHub Pages is solid for a public demo and static QR traffic. For live ticket caps, admin login, webhooks, and payment reconciliation,
-          the professional path is Vercel or Netlify plus a small database-backed API.
-        </p>
-      </div>
-      <div className="architecture-steps">
-        {checkoutPlan.map((step, index) => (
-          <span key={step.title}>
-            <strong>{index + 1}. {step.title}</strong>
-            <small>{step.detail}</small>
-          </span>
-        ))}
-      </div>
-    </section>
-  )
-}
-
 function ImpactLedger({ go }) {
   return (
     <section className="impact-ledger">
@@ -1025,10 +919,10 @@ function ImpactLedger({ go }) {
 function EventsPage({ selectedEvent, setSelectedEvent, go }) {
   return (
     <>
-      <PageIntro kicker="Event center" icon={CalendarDays} title="Every Minnesota fundraiser gets a clean event page." copy="Mud Fest is the launch event, but this is built as a repeatable Log A Load hub for truck pulls, golf outings, raffles, dinners, and future local fundraisers." />
+      <PageIntro kicker="Current event" icon={CalendarDays} title="Hillman Mud Bog tickets and charity details." copy="For now, Log A Load Minnesota is focused on this one fundraiser. Future events can be added once the Mud Bog flow is approved." />
       <section className="page-grid">
         <div className="event-list">
-          {events.map((event) => (
+          {[events[0]].map((event) => (
             <button className={selectedEvent.id === event.id ? 'event-card active' : 'event-card'} key={event.id} type="button" onClick={() => setSelectedEvent(event)}>
               <EventVisual event={event} compact />
               <span>{event.status}</span>
@@ -1066,9 +960,7 @@ function EventsPage({ selectedEvent, setSelectedEvent, go }) {
           <div className="hero-actions">
             <button className="primary-button" type="button" onClick={() => go(selectedEvent.pagePath)}>{selectedEvent.actionLabel}</button>
             <button className="secondary-button" type="button" onClick={() => go('/tickets')}>Tickets</button>
-            <button className="secondary-button" type="button" onClick={() => go('/register')}>Event registration</button>
             <button className="secondary-button" type="button" onClick={() => go('/donate')}>Donate to this event</button>
-            <button className="secondary-button" type="button" onClick={() => go('/qr-kit')}>QR kit</button>
           </div>
         </div>
       </section>
@@ -1081,27 +973,6 @@ function UsersLabel({ event }) {
     <>
       <ClipboardList size={14} /> {event.audience}
     </>
-  )
-}
-
-function QrPanel({ target }) {
-  return (
-    <div className="qr-box">
-      <img src={assetPath(target.image)} alt={`QR code for ${target.label}`} loading="eager" decoding="async" />
-      <span>{target.url}</span>
-    </div>
-  )
-}
-
-function QrRouteCard({ target, go }) {
-  const Icon = target.icon
-  return (
-    <button className="qr-route-card" type="button" onClick={() => go(target.path)}>
-      <img src={assetPath(target.image)} alt={`QR code for ${target.label}`} loading="eager" decoding="async" />
-      <span><Icon size={17} /> {target.label}</span>
-      <strong>{target.detail}</strong>
-      <small>{target.url}</small>
-    </button>
   )
 }
 
@@ -1177,8 +1048,7 @@ function EventActionPanel({ event, go, compact = false }) {
       <HostSiteAction event={event} />
       <button type="button" onClick={() => go('/tickets')}><Ticket size={17} /><span>Tickets</span></button>
       <button type="button" onClick={() => go('/donate')}><BadgeDollarSign size={17} /><span>Donate</span></button>
-      <button type="button" onClick={() => go('/register')}><ClipboardList size={17} /><span>Register</span></button>
-      <button type="button" onClick={() => go('/event-day')}><Gauge size={17} /><span>Event-day mode</span></button>
+      <button type="button" onClick={() => go('/vendors')}><Store size={17} /><span>Vendors</span></button>
       <button type="button" onClick={() => go('/faq')}><FileText size={17} /><span>Rules / FAQ</span></button>
     </div>
   )
@@ -1192,14 +1062,11 @@ function EventDetailPage({ event, go }) {
         kicker="Event page"
         icon={Icon}
         title={`${event.label} charity command page.`}
-        copy={`${event.summary} This page shows the exact V3 structure each Minnesota fundraiser can receive: host links, tickets, donations, registration, QR tools, sponsors, event-day instructions, and after-event impact.`}
+        copy={`${event.summary} This page shows the exact V3 structure each Minnesota fundraiser can receive: host links, tickets, donations, registration, sponsors, event-day instructions, and after-event impact.`}
       />
       <section className="event-command-page">
         <div className="event-command-media">
           <EventVisual event={event} />
-          <div className="event-command-qr">
-            <QrPanel target={{ image: event.qrImage, label: event.label, url: `${publicSiteUrl}#${event.pagePath}` }} />
-          </div>
         </div>
         <div className="event-command-copy">
           <div className="section-kicker"><LayoutDashboard size={16} /> Event command center</div>
@@ -1234,80 +1101,6 @@ function EventDetailPage({ event, go }) {
   )
 }
 
-function EventDayPage({ go }) {
-  return (
-    <>
-      <PageIntro
-        kicker="Event-day mode"
-        icon={Gauge}
-        title="A phone-first command page for the day of the event."
-        copy="This is the page a visitor or staff member can open from a QR sign at the gate. It should answer receipt, check-in, camping, pit pass, weather, and contact questions without hunting through the whole website."
-      />
-      <section className="event-day-layout">
-        <div className="event-day-phone">
-          <div className="section-kicker"><QrCode size={16} /> Live QR target</div>
-          <h2>Mud Fest event-day help</h2>
-          <QrPanel target={qrKitTargets.find((target) => target.path === '/event-day')} />
-          <div className="event-day-status">
-            <span><strong>Gate status</strong> Prototype ready</span>
-            <span><strong>Weather banner</strong> Connect before launch</span>
-            <span><strong>Help desk</strong> Contact form for v1</span>
-          </div>
-        </div>
-        <div className="event-day-actions">
-          {eventDayCards.map((card) => {
-            const Icon = card.icon
-            return (
-              <button type="button" onClick={() => go(card.path)} key={card.title}>
-                <Icon size={22} />
-                <span>{card.title}</span>
-                <strong>{card.detail}</strong>
-                <small>{card.action}</small>
-              </button>
-            )
-          })}
-        </div>
-      </section>
-      <MoneyClaritySection />
-    </>
-  )
-}
-
-function QrKitPage({ go }) {
-  return (
-    <>
-      <PageIntro
-        kicker="QR print kit"
-        icon={QrCode}
-        title="Every flyer, sign, and booth gets the right QR code."
-        copy="This turns QR from a single homepage gimmick into an operating tool. Admins can print different codes for tickets, donations, registration, vendors, and event-day help."
-      />
-      <section className="qr-kit-grid">
-        {qrKitTargets.map((target) => <QrKitCard target={target} go={go} key={target.label} />)}
-      </section>
-    </>
-  )
-}
-
-function QrKitCard({ target, go }) {
-  const Icon = target.icon
-  return (
-    <div className="qr-kit-card">
-      <img src={assetPath(target.image)} alt={`QR code for ${target.label}`} loading="eager" decoding="async" />
-      <div>
-        <div className="section-kicker"><Icon size={16} /> {target.label}</div>
-        <h2>{target.label}</h2>
-        <p>{target.detail}</p>
-        <small>{target.url}</small>
-      </div>
-      <div className="hero-actions">
-        <button className="primary-button" type="button" onClick={() => go(target.path)}>Open page</button>
-        <a className="secondary-button" href={assetPath(target.image)} download>Download SVG</a>
-      </div>
-    </div>
-  )
-}
-
 function MoneyClaritySection() {
   return (
     <section className="money-clarity-section">
@@ -1318,7 +1111,7 @@ function MoneyClaritySection() {
       </div>
       <div className="money-clarity-grid">
         <span><strong>Receiver</strong>Log A Load Minnesota or the approved fiscal host owns payment accounts.</span>
-        <span><strong>Fund selected</strong>Donors choose Mud Fest, CMN, local support, or where it helps most.</span>
+        <span><strong>Fund selected</strong>Donors choose Mud Bog, CMN, local support, or where it helps most.</span>
         <span><strong>Receipt</strong>PayPal or Stripe sends the payment receipt; this site returns a confirmation page.</span>
         <span><strong>Issue path</strong>FAQ/contact form routes buyer, vendor, camping, pit pass, and payment questions.</span>
       </div>
@@ -1375,7 +1168,7 @@ function DonatePage({ selectedFund, setSelectedFund, selectedPayment, setSelecte
 
   return (
     <>
-      <PageIntro kicker="Donations" icon={BadgeDollarSign} title="Let donors choose the exact charity lane." copy="Mud Fest ticket money can feed the event charity pool, while extra gifts can go to Children’s Miracle Network, local family support, or wherever Log A Load needs it most." />
+      <PageIntro kicker="Donations" icon={BadgeDollarSign} title="Let donors choose the exact charity lane." copy="Mud Bog ticket money can feed the event charity pool, while extra gifts can go to Children’s Miracle Network, local family support, or wherever Log A Load needs it most." />
       <PageSignalBand items={pageSignals.donate} />
       <section className="form-page-grid">
         <div className="fund-grid tall">
@@ -1435,7 +1228,7 @@ function TicketsPage({ selectedTicket, setSelectedTicket, selectedPayment, setSe
 
   return (
     <>
-      <PageIntro kicker="Mud Fest tickets" icon={Ticket} title="Build a Mud Fest order and send it to hosted checkout." copy="General admission, kids tickets, pit passes, and camping are separated with final wording notes. PayPal is the v1 checkout path; Stripe and Venmo can be connected without storing card data here." />
+      <PageIntro kicker="Mud Bog tickets" icon={Ticket} title="Build a Hillman Mud Bog order and send it to hosted checkout." copy="General admission, kids tickets, pit passes, and camping are separated with final wording notes. PayPal is the v1 checkout path; Stripe and Venmo can be connected without storing card data here." />
       <PageSignalBand items={pageSignals.tickets} />
       <section className="tickets-page">
         <div className="ticket-stack">
@@ -1457,12 +1250,12 @@ function TicketsPage({ selectedTicket, setSelectedTicket, selectedPayment, setSe
             <span>Availability is a launch model right now. Real sold-out protection needs provider inventory limits or a database-backed checkout before taking money.</span>
           </div>
           <div className="event-vibe-card">
-            <div><Mountain size={22} /><strong>Mud Fest Hillman</strong></div>
+            <div><Mountain size={22} /><strong>Hillman Mud Bog</strong></div>
             <span>Food trucks</span>
             <span>Beer garden</span>
             <span>Camping</span>
             <span>Truck action</span>
-            <small>Details based on notes plus public Mud Fest event framing. Prices marked uncertain should be confirmed before launch.</small>
+            <small>Details based on notes plus public Mud Fest Hillman event framing. Prices marked uncertain should be confirmed before launch.</small>
           </div>
         </div>
         <form className="form-card ticket-checkout" onSubmit={(event) => handleHostedPayment(event, 'tickets', selectedPayment, { total: formatMoney(ticketTotal) })}>
@@ -1483,7 +1276,7 @@ function TicketsPage({ selectedTicket, setSelectedTicket, selectedPayment, setSe
             ))}
             <em>Total {formatMoney(ticketTotal)}</em>
           </div>
-          <label>Event<input name="event" value="Mud Fest Hillman" readOnly /></label>
+          <label>Event<input name="event" value="Hillman Mud Bog" readOnly /></label>
           <div className="payment-method-grid" aria-label="Payment method options">
             {paymentMethods.map((method) => (
               <button className={selectedPayment.id === method.id ? 'payment-method selected' : 'payment-method'} type="button" key={method.id} onClick={() => setSelectedPayment(method)}>
@@ -1537,7 +1330,7 @@ function ParticipantsPage({ handleSubmit }) {
             <label>Email<input name="email" type="email" placeholder="you@example.com" required /></label>
           </div>
           <div className="two-col">
-            <label>Event<select name="event" defaultValue="Mud Fest Hillman">{events.map((event) => <option key={event.id}>{event.label}</option>)}</select></label>
+            <label>Event<select name="event" defaultValue="Hillman Mud Bog">{[events[0]].map((event) => <option key={event.id}>{event.label}</option>)}</select></label>
             <label>Signup type<select name="signupType" defaultValue={participantOptions[0].option}>{participantOptions.map((item) => <option key={item.option}>{item.option}</option>)}</select></label>
           </div>
           <div className="two-col">
@@ -1556,7 +1349,7 @@ function ParticipantsPage({ handleSubmit }) {
 function VendorsPage({ handleSubmit }) {
   return (
     <>
-      <PageIntro kicker="Vendors + sponsors" icon={Store} title="Give every event partner a clean public lane." copy="Food vendors, beer garden sponsors, camping operations, Log A Load booths, golf sponsors, and future sponsor packages all need a clean form, clear status, and admin follow-up path." />
+      <PageIntro kicker="Vendors + sponsors" icon={Store} title="Give every Mud Bog partner a clean public lane." copy="Food vendors, beer garden sponsors, camping operations, Log A Load booths, and sponsor packages all need a clean form, clear status, and admin follow-up path." />
       <PageSignalBand items={pageSignals.vendors} />
       <section className="page-grid">
         <div className="vendor-page-stack">
@@ -1589,7 +1382,7 @@ function VendorsPage({ handleSubmit }) {
             <label>Phone<input name="phone" type="tel" placeholder="(555) 000-0000" /></label>
           </div>
           <label>Booth type<select name="booth" defaultValue="10x10 Vendor Booth"><option>10x10 Vendor Booth</option><option>20x20 Vendor Booth</option><option>Food Vendor</option><option>Sponsor Table</option></select></label>
-          <label>Event interest<select name="eventInterest" defaultValue="Mud Fest Hillman"><option>Mud Fest Hillman</option><option>Future Truck Pull</option><option>Golf Classic</option><option>General sponsor</option></select></label>
+          <label>Event interest<select name="eventInterest" defaultValue="Hillman Mud Bog"><option>Hillman Mud Bog</option><option>General sponsor</option></select></label>
           <label>Website or social page<input name="website" placeholder="https://example.com or Facebook page" /></label>
           <label>Setup needs<textarea name="setupNeeds" placeholder="Power, space, arrival timing, product/menu, sponsor questions, or insurance notes" /></label>
           <button className="primary-button full" type="submit">Send vendor request</button>
@@ -1603,7 +1396,7 @@ function VendorsPage({ handleSubmit }) {
 function FaqPage({ handleSubmit }) {
   return (
     <>
-      <PageIntro kicker="FAQ + rules" icon={FileText} title="Answer the buyer questions before they slow down checkout." copy="This page keeps pricing notes, payment safety, event rules, and contact paths in one place so QR-code visitors can make a decision quickly." />
+      <PageIntro kicker="FAQ + rules" icon={FileText} title="Answer the buyer questions before they slow down checkout." copy="This page keeps pricing notes, payment safety, event rules, and contact paths in one place so visitors can make a decision quickly." />
       <PageSignalBand items={pageSignals.faq} />
       <section className="faq-layout">
         <div className="faq-list">
@@ -1615,7 +1408,7 @@ function FaqPage({ handleSubmit }) {
           ))}
         </div>
         <div className="rules-box launch-rules">
-          <h3>Mud Fest rule notes</h3>
+          <h3>Mud Bog rule notes</h3>
           {mudFestRules.map((rule) => <span key={rule}><CheckCircle2 size={15} /> {rule}</span>)}
         </div>
         <form className="form-card contact-card" onSubmit={(event) => handleSubmit(event, 'Contact request')}>
@@ -1661,10 +1454,10 @@ function SuccessPage({ go }) {
             <span><strong>Status</strong>{preview ? 'Preview mode' : 'Payment provider complete'}</span>
           </div>
           <p>
-            Bring the payment provider receipt to check-in until barcode scanning is connected. Admins should reconcile this record against PayPal/Stripe reports before final settlement.
+            Bring the payment provider receipt to check-in until digital ticket validation is connected. Admins should reconcile this record against PayPal/Stripe reports before final settlement.
           </p>
           <div className="hero-actions">
-            <button className="primary-button large" type="button" onClick={() => go('/mudfest')}>Back to Mud Fest</button>
+            <button className="primary-button large" type="button" onClick={() => go('/mudfest')}>Back to Mud Bog</button>
             <button className="secondary-button large" type="button" onClick={() => go('/faq')}>Rules + contact</button>
           </div>
         </div>
@@ -1672,7 +1465,7 @@ function SuccessPage({ go }) {
           <h2>What happens next</h2>
           <span><CheckCircle2 size={17} /> Buyer gets a PayPal or Stripe receipt once real checkout is connected.</span>
           <span><CheckCircle2 size={17} /> Admin receives a payment webhook/form record in production.</span>
-          <span><CheckCircle2 size={17} /> Gate check-in uses CSV export until scanner/barcode logic is added.</span>
+          <span><CheckCircle2 size={17} /> Gate check-in uses CSV export until digital ticket validation is added.</span>
           <span><CheckCircle2 size={17} /> Donation fund selection stays visible for reconciliation.</span>
         </div>
       </section>
@@ -1788,7 +1581,7 @@ function AdminPage({ setSelectedEvent, go, handleSubmit, backendStatus }) {
 
   const adminTools = [
     { icon: PlusCircle, title: 'Add event', copy: 'Non-technical event setup wizard for future Mud Fest, truck pull, golf, raffle, or dinner pages.' },
-    { icon: Edit3, title: 'Edit content', copy: 'Update hero copy, videos, prices, schedules, sponsor blocks, rules, and QR targets.' },
+    { icon: Edit3, title: 'Edit content', copy: 'Update hero copy, videos, prices, schedules, sponsor blocks, rules, and public links.' },
     { icon: Settings2, title: 'Tickets + funds', copy: 'Change admission, kids pricing, pit pass, camping, fund options, limits, and disclaimers.' },
     { icon: Mail, title: 'Admin alerts', copy: 'Route vendor, registration, ticket, donation, and sponsor emails to the right people.' },
     { icon: Download, title: 'Exports', copy: 'Download CSV lists for gate check-in, vendor setup, donor follow-up, and sponsors.' },
@@ -1806,7 +1599,7 @@ function AdminPage({ setSelectedEvent, go, handleSubmit, backendStatus }) {
       { value: liveTicketInventory.reduce((sum, ticket) => sum + ticket.remaining, 0), label: 'tickets left', detail: 'Backend capacity model' },
     ]
     : [
-      { value: '312', label: 'QR scans', detail: 'Preview analytics placeholder' },
+      { value: '312', label: 'visitors', detail: 'Preview analytics placeholder' },
       { value: '$12,640', label: 'launch raised', detail: 'Static prototype metric' },
       { value: '64%', label: 'PayPal checkout', detail: 'Preview payment mix' },
       { value: '219', label: 'tickets left', detail: 'Static inventory model' },
@@ -1988,7 +1781,7 @@ function AdminPage({ setSelectedEvent, go, handleSubmit, backendStatus }) {
             ))}
           </div>
           <div className="hero-actions">
-            <button className="secondary-button" type="button" onClick={() => { setSelectedEvent(events[0]); go('/mudfest') }}>Preview Mud Fest</button>
+            <button className="secondary-button" type="button" onClick={() => { setSelectedEvent(events[0]); go('/mudfest') }}>Preview Mud Bog</button>
             <button className="secondary-button" type="button" onClick={() => go('/donate')}>Preview donation flow</button>
           </div>
         </div>
@@ -2021,26 +1814,6 @@ function AdminLockedPage({ go }) {
         </div>
       </section>
     </>
-  )
-}
-
-function ReviewSection() {
-  return (
-    <section className="review-section">
-      <div>
-        <div className="section-kicker"><ShieldCheck size={16} /> Product review</div>
-        <h2>What is still missing before this is real.</h2>
-      </div>
-      <div className="review-grid">
-        <span><CheckCircle2 size={17} /> Real Log A Load Minnesota logo approval and brand rules</span>
-        <span><CheckCircle2 size={17} /> Confirm Mud Fest ticket wording: kids pricing and whether camping includes admission</span>
-        <span><CheckCircle2 size={17} /> Admin login and permissions so only trusted users can edit</span>
-        <span><CheckCircle2 size={17} /> Database tables for events, funds, vendors, tickets, donations, sponsors</span>
-        <span><CheckCircle2 size={17} /> PayPal business/nonprofit account owned by the organization or fiscal host</span>
-        <span><CheckCircle2 size={17} /> Registration role templates for each event: volunteer, competitor, golfer, sponsor, or staff</span>
-        <span><CheckCircle2 size={17} /> Mud Fest photos/video permissions, sponsor assets, and QR-code landing URLs</span>
-      </div>
-    </section>
   )
 }
 
